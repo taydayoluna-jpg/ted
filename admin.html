@@ -1,0 +1,1733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Executive Control Console — Crest Academy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-main: #060814;
+      --bg-card: #0b112c;
+      --bg-input: #12193d;
+      --accent-primary: #38bdf8;
+      --accent-hover: #0288d1;
+      --text-main: #f1f5f9;
+      --text-muted: #64748b;
+      --border-color: rgba(56, 189, 248, 0.15);
+      --success: #10b981;
+      --danger: #ef4444;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+    body { background-color: var(--bg-main); color: var(--text-main); padding: 40px 5%; }
+
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
+    h1 { font-size: 26px; font-weight: 800; }
+    h1 span { color: var(--accent-primary); }
+
+    .back-btn { text-decoration: none; color: var(--text-muted); font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: color 0.2s; }
+    .back-btn:hover { color: var(--accent-primary); }
+
+    .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+    @media (max-width: 900px) { .admin-grid { grid-template-columns: 1fr; } }
+
+    .panel-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
+    .panel-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 25px; display: flex; align-items: center; gap: 10px; color: #fff; }
+
+    .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+    .form-group label { font-size: 12px; font-weight: 600; color: var(--accent-primary); text-transform: uppercase; letter-spacing: 0.05em; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 14px 16px; background: var(--bg-input); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; color: #fff; font-size: 14px; outline: none; transition: all 0.3s; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent-primary); background: #16204d; }
+
+    .upload-box { border: 2px dashed var(--border-color); border-radius: 14px; padding: 30px; text-align: center; background: rgba(56,189,248,0.02); cursor: pointer; transition: all 0.2s; margin-bottom: 20px; }
+    .upload-box:hover { border-color: var(--accent-primary); background: rgba(56,189,248,0.05); }
+    .upload-box i { font-size: 36px; color: var(--text-muted); margin-bottom: 12px; }
+    .upload-box p { font-size: 13px; color: var(--text-muted); }
+    .upload-box .file-indicator { margin-top: 10px; font-weight: 600; color: var(--success); display: none; }
+
+    .action-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--accent-hover), var(--accent-primary)); color: #040714; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 20px rgba(56,189,248,0.25); }
+    .action-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(56,189,248,0.35); }
+    .action-btn:disabled { background: var(--bg-input); color: var(--text-muted); cursor: not-allowed; box-shadow: none; transform: none; }
+
+    .status-msg { margin-top: 15px; padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 500; display: none; }
+    .status-msg.success { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); color: var(--success); }
+    .status-msg.danger { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: var(--danger); }
+
+    .catalog-list { max-height: 650px; overflow-y: auto; padding-right: 5px; }
+    .folder-node { margin-bottom: 12px; background: rgba(255,255,255,0.01); border-radius: 12px; border: 1px solid rgba(255,255,255,0.03); overflow: hidden; }
+    .folder-header { background: #0e1435; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; transition: background 0.2s; }
+    .folder-header:hover { background: #131b46; }
+    .folder-title-area { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; color: #fff; }
+    .folder-title-area i { color: #f59e0b; font-size: 16px; }
+    .folder-meta-count { font-size: 11px; color: var(--accent-primary); background: rgba(56,189,248,0.1); padding: 2px 8px; border-radius: 20px; font-weight: 600; }
+    .folder-contents { padding: 12px 12px 12px 25px; display: none; border-top: 1px solid rgba(255,255,255,0.03); background: #090e24; }
+    
+    .sub-folder { margin-bottom: 8px; border-left: 2px dashed rgba(56,189,248,0.2); padding-left: 10px; }
+    
+    .book-item { background: #111842; border: 1px solid rgba(255,255,255,0.02); border-radius: 10px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 8px; }
+    .book-item-info h4 { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+    .book-meta { display: flex; gap: 10px; font-size: 11px; color: var(--text-muted); }
+    .meta-tag i { color: var(--accent-primary); font-size: 10px; }
+    
+    .del-btn { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: var(--danger); width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
+    .del-btn:hover { background: var(--danger); color: #fff; }
+
+    .catalog-section { margin-top: 50px; }
+    .catalog-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* RICH MEDIA CHAT ATTACHMENT MENU STYLES */
+    .chat-control-wrapper { display: flex; flex-direction: column; width: 100%; position: relative; }
+    .chat-action-bar { display: flex; gap: 12px; align-items: center; width: 100%; }
+    .attachment-container { position: relative; display: flex; align-items: center; }
+    
+    .attach-trigger-btn { background: var(--bg-input); border: 1px solid var(--border-color); color: var(--accent-primary); width: 48px; height: 48px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: all 0.2s; }
+    .attach-trigger-btn:hover { background: rgba(56, 189, 248, 0.1); border-color: var(--accent-primary); }
+    .attach-trigger-btn.active { background: var(--accent-primary); color: #060814; transform: rotate(45deg); }
+
+    .attachment-dropdown { position: absolute; bottom: 60px; left: 0; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 8px; display: none; flex-direction: column; gap: 4px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 100; min-width: 180px; }
+    .attachment-option { display: flex; align-items: center; gap: 10px; padding: 10px 14px; font-size: 13px; color: var(--text-main); cursor: pointer; border-radius: 8px; transition: background 0.2s; text-align: left; background: none; border: none; width: 100%; }
+    .attachment-option:hover { background: rgba(56, 189, 248, 0.08); color: var(--accent-primary); }
+    .attachment-option i { width: 18px; text-align: center; }
+
+    .chat-staging-banner { display: none; background: rgba(56, 189, 248, 0.05); border: 1px dashed var(--border-color); padding: 8px 12px; border-radius: 8px; font-size: 12px; color: var(--accent-primary); align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .chat-staging-banner button { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 14px; }
+
+    /* RECORD MODAL STYLES */
+    .record-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(4, 7, 20, 0.8); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+    .record-modal-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 25px; width: 100%; max-width: 500px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+    .record-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .record-modal-header h4 { font-size: 16px; font-weight: 700; color: #fff; }
+    .record-modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
+
+    /* LIVE CAMERA / VOICE CAPTURE MODAL STYLES */
+    .capture-modal-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 22px; width: 100%; max-width: 480px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+    .capture-stage { width: 100%; background: #000; border-radius: 14px; overflow: hidden; position: relative; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; }
+    .capture-stage video, .capture-stage img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .capture-stage.audio-stage { aspect-ratio: auto; height: 140px; background: linear-gradient(135deg, #12193d, #0b112c); }
+
+    .capture-rec-dot { position: absolute; top: 12px; left: 12px; display: none; align-items: center; gap: 6px; background: rgba(0,0,0,0.55); padding: 6px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; color: #fff; letter-spacing: 0.04em; }
+    .capture-rec-dot.live { display: flex; }
+    .capture-rec-dot .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--danger); animation: pulseDot 1s infinite; }
+    @keyframes pulseDot { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+    .capture-timer { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.55); padding: 6px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; color: #fff; display: none; }
+    .capture-timer.live { display: flex; }
+
+    .mic-visualizer { display: flex; align-items: center; justify-content: center; gap: 4px; height: 100%; width: 100%; }
+    .mic-visualizer .bar { width: 5px; border-radius: 4px; background: var(--accent-primary); height: 8px; transition: height 0.08s ease; }
+
+    .capture-controls { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 18px; }
+    .cap-btn { border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+    .cap-btn-main { width: 64px; height: 64px; background: var(--danger); color: #fff; font-size: 22px; box-shadow: 0 0 0 4px rgba(239,68,68,0.2); }
+    .cap-btn-main:hover { transform: scale(1.05); }
+    .cap-btn-main.is-recording { background: #fff; color: var(--danger); }
+    .cap-btn-secondary { width: 48px; height: 48px; background: var(--bg-input); color: var(--text-main); font-size: 16px; border: 1px solid var(--border-color); }
+    .cap-btn-secondary:hover { background: rgba(56,189,248,0.1); color: var(--accent-primary); }
+    .cap-btn-secondary:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .capture-mode-label { text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 12px; font-weight: 500; }
+    .capture-error-box { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); color: #fca5a5; font-size: 12px; padding: 10px 12px; border-radius: 10px; margin-top: 12px; display: none; line-height: 1.5; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div>
+      <h1>Executive <span>Control Console</span></h1>
+      <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Crest Academy Database Pipeline Administration</p>
+    </div>
+    <div style="display:flex; align-items:center; gap:14px;">
+      <div style="text-align:right;">
+        <div style="font-size:12px; font-weight:700; color:#fff;" id="staffNameDisplay"></div>
+        <div style="font-size:10px; color:var(--text-muted);" id="staffRoleDisplay"></div>
+      </div>
+      <button onclick="logoutStaff()" title="Sign out" style="background: rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); color: var(--danger); width:38px; height:38px; border-radius:10px; cursor:pointer; font-size:14px;"><i class="fas fa-right-from-bracket"></i></button>
+      <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left-long"></i> Exit Console Directory</a>
+    </div>
+  </header>
+
+  <div class="admin-grid">
+    
+    <!-- Dispatch Panel Card -->
+    <div class="panel-card">
+      <h3><i class="fa-solid fa-cloud-arrow-up" style="color:var(--accent-primary);"></i> Dispatch New Resource</h3>
+      
+      <div class="form-group">
+        <label>Resource Node Title</label>
+        <input type="text" id="bookTitle" placeholder="e.g. Pure Mathematics Masterclass Vol. 1" />
+      </div>
+
+      <div class="form-group">
+        <label>System Track Level</label>
+        <select id="bookLevel" onchange="adaptFormAllocations()">
+          <option value="primary">Primary School Tier</option>
+          <option value="secondary" selected>Secondary School Tier</option>
+          <option value="tertiary">Tertiary Advanced Level</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Grade Allocation Node</label>
+        <select id="bookClass"></select>
+      </div>
+
+      <div class="form-group">
+        <label>Subject Allocation Core</label>
+        <select id="bookSubject"></select>
+      </div>
+
+      <div class="form-group">
+        <label>Resource Asset Category</label>
+        <select id="bookType">
+          <option value="Book">📖 eBook Textbook</option>
+          <option value="Video Lesson">📺 Video Masterclass</option>
+          <option value="Notes">📓 Lecture Notes</option>
+          <option value="Past Paper">📝 Past Exam Paper</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Curriculum Stream Syllabus</label>
+        <select id="bookSyllabus">
+          <option value="Cambridge">Cambridge Framework</option>
+          <option value="National">National Curriculum</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Resource Description Summary</label>
+        <textarea id="bookDesc" rows="3" placeholder="Provide description metadata..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Upload Selection Mode</label>
+        <select id="uploadMode" onchange="toggleUploadMode()">
+          <option value="file">📄 Single File Mode</option>
+          <option value="folder">📁 Whole Folder Mode</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Cloud Storage File Upload</label>
+        <div class="upload-box" onclick="triggerSystemFileBrowser()">
+          <i class="fa-solid fa-folder-open" id="uploadBoxIcon"></i>
+          <p id="uploadPromptText">Click here to select resource asset file node stream</p>
+          <div class="file-indicator" id="fileIndicator"></div>
+        </div>
+        <input type="file" id="hiddenFileBrowser" style="display: none;" onchange="handleFileSelection(event)" />
+        <input type="file" id="hiddenFolderBrowser" style="display: none;" webkitdirectory directory onchange="handleFolderSelection(event)" />
+      </div>
+
+      <button class="action-btn" id="submitBtn" onclick="executeResourceCloudDeployment()">
+        <i class="fa-solid fa-circle-check"></i> Initialize Cloud Deployment
+      </button>
+
+      <div class="status-msg" id="panelStatus"></div>
+    </div>
+
+    <!-- Structured File Explorer Panel Card -->
+    <div class="panel-card">
+      <h3><i class="fa-solid fa-network-wired" style="color:var(--success);"></i> Structured File Explorer (<span id="catalogCount">0</span>)</h3>
+      <div class="catalog-list" id="bookList">
+        <p style="color:var(--text-muted);font-style:italic;font-size:13px;">Syncing server parameters...</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Assignments Portal Entry Point -->
+  <div class="catalog-section">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; background: linear-gradient(135deg, rgba(56,189,248,0.08), rgba(2,136,209,0.05)); border: 1px solid var(--border-color); border-radius: 16px; padding: 22px 26px;">
+      <div>
+        <div style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px;"><i class="fas fa-graduation-cap" style="color: var(--accent-primary); margin-right: 8px;"></i> Assignments Portal</div>
+        <div style="font-size: 12px; color: var(--text-muted);">Post assignments, review submissions, and grade student work.</div>
+      </div>
+      <a href="assignments.html?role=admin" target="_blank" style="background: linear-gradient(135deg, var(--accent-hover), var(--accent-primary)); color: #040714; padding: 12px 22px; border-radius: 10px; font-size: 13px; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 20px rgba(56,189,248,0.25);"><i class="fas fa-arrow-up-right-from-square"></i> Open Faculty Console</a>
+    </div>
+  </div>
+
+  <!-- Manage Staff (root admin only, shown/hidden via JS) -->
+  <div class="catalog-section" id="manageStaffSection" style="display:none;">
+    <div class="catalog-title">Staff Accounts</div>
+    <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+      <div id="staffAccountsList"><div style="text-align:center; color:var(--text-muted); font-size:12px; padding:20px 0;">Loading staff accounts...</div></div>
+    </div>
+  </div>
+
+  <!-- Student Correspondence Center Section -->
+  <div class="catalog-section">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+      <div class="catalog-title" style="margin-bottom: 0;">Student Correspondence Center</div>
+      <button onclick="refreshAdminChatMesh()" style="background: rgba(56, 189, 248, 0.08); border: 1px solid var(--border-color); color: var(--accent-primary); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 500; display: flex; align-items: center; gap: 8px;"><i class="fas fa-rotate"></i> Sync Feed</button>
+    </div>
+    
+    <div style="background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+
+      <div style="background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px;">
+        <span style="font-size: 11px; font-weight: 700; color: var(--accent-primary); text-transform: uppercase; letter-spacing: 0.08em;">External Support Pipelines &amp; Nodes:</span>
+        <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center;">
+          <a href="https://meet.google.com" target="_blank" style="text-decoration: none; color: #fff; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+            <i class="fas fa-video" style="color: var(--accent-primary);"></i> Google Meet Dashboard
+          </a>
+          <a href="https://web.whatsapp.com/" target="_blank" style="text-decoration: none; color: #fff; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+            <i class="fab fa-whatsapp" style="color: var(--success);"></i> WhatsApp Web
+          </a>
+          <a href="mailto:taydayoluna@gmail.com" style="text-decoration: none; color: #fff; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+            <i class="fas fa-envelope" style="color: #cbd5e1;"></i> taydayoluna@gmail.com
+          </a>
+          <span style="font-size: 12px; color: var(--text-muted); font-weight: 500;">
+            <i class="fas fa-headset" style="color: #f59e0b;"></i> Backup Helpline: 0884662849
+          </span>
+        </div>
+      </div>
+
+      <div id="adminChatMessagesLog" style="height: 340px; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; background: rgba(4, 7, 20, 0.4); border: 1px solid rgba(255,255,255,0.02); border-radius: 12px; margin-bottom: 20px;"></div>
+
+      <div class="chat-control-wrapper">
+        <!-- Staging Indicator for attachments ready to drop -->
+        <div class="chat-staging-banner" id="chatStagingBanner">
+          <span id="chatStagingText">📄 Staged File: sample.pdf</span>
+          <button onclick="clearStagedChatFile()"><i class="fas fa-times-circle"></i></button>
+        </div>
+
+        <div class="chat-action-bar">
+          <!-- Attachment Dropdown Container -->
+          <div class="attachment-container">
+            <button class="attach-trigger-btn" id="chatAttachBtn" onclick="toggleChatAttachmentMenu(event)">
+              <i class="fas fa-plus"></i>
+            </button>
+            <div class="attachment-dropdown" id="chatAttachDropdown">
+              <button class="attachment-option" onclick="openRecordModal()"><i class="fas fa-clipboard-list" style="color: var(--accent-primary);"></i> Add official record</button>
+              <button class="attachment-option" onclick="startVideoCallInvite()"><i class="fas fa-video" style="color: #22c55e;"></i> Start Video Call</button>
+              <button class="attachment-option" onclick="openLiveCapture('image')"><i class="fas fa-camera" style="color: #ed4956;"></i> Take Photo</button>
+              <button class="attachment-option" onclick="openLiveCapture('video')"><i class="fas fa-video" style="color: #a855f7;"></i> Record Video</button>
+              <button class="attachment-option" onclick="openLiveCapture('audio')"><i class="fas fa-microphone" style="color: #f59e0b;"></i> Record Voice Note</button>
+              <button class="attachment-option" onclick="triggerChatDocumentUpload()"><i class="fas fa-file-invoice" style="color: var(--success);"></i> Upload Document</button>
+            </div>
+          </div>
+
+          <!-- Hidden System Capture Fallbacks -->
+          <input type="file" id="chatCameraPhotoInput" accept="image/*" capture="environment" style="display:none;" onchange="handleChatFileStaging(event, 'image')">
+          <input type="file" id="chatCameraVideoInput" accept="video/*" capture="environment" style="display:none;" onchange="handleChatFileStaging(event, 'video')">
+          <input type="file" id="chatDocumentInput" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt" style="display:none;" onchange="handleChatFileStaging(event, 'document')">
+
+          <input type="text" id="adminChatInputField" placeholder="Type a message reply here..." onkeydown="if(event.key === 'Enter') dispatchAdminChatMessage()" style="flex: 1; padding: 14px 16px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 12px; color: #fff; font-size: 13px; outline: none;" />
+          <button id="adminChatSendBtn" onclick="dispatchAdminChatMessage()" style="background: linear-gradient(135deg, var(--accent-hover), var(--accent-primary)); color: #060814; font-weight: 600; padding: 14px 24px; border: none; border-radius: 12px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-paper-plane"></i> Send Reply</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Camera / Voice Capture Overlay Modal -->
+  <div class="record-modal" id="liveCaptureModal">
+    <div class="capture-modal-content">
+      <div class="record-modal-header">
+        <h4 id="captureModalTitle"><i class="fas fa-camera" style="color: var(--accent-primary);"></i> Take Photo</h4>
+        <button onclick="closeLiveCapture()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:16px;"><i class="fas fa-times"></i></button>
+      </div>
+
+      <div class="capture-stage" id="captureStage">
+        <video id="captureLiveVideo" autoplay playsinline muted></video>
+        <img id="capturePhotoPreview" style="display:none;" />
+        <video id="captureVideoPreview" style="display:none;" controls></video>
+        <div class="capture-rec-dot" id="captureRecDot"><span class="dot"></span> REC</div>
+        <div class="capture-timer" id="captureTimer">00:00</div>
+      </div>
+
+      <div class="capture-error-box" id="captureErrorBox"></div>
+      <div class="capture-mode-label" id="captureModeLabel">Allow camera access to begin live capture.</div>
+
+      <canvas id="capturePhotoCanvas" style="display:none;"></canvas>
+
+      <div class="capture-controls" id="captureControls">
+        <button class="cap-btn cap-btn-secondary" id="captureRetakeBtn" onclick="retakeCapture()" disabled title="Retake"><i class="fas fa-rotate-left"></i></button>
+        <button class="cap-btn cap-btn-main" id="captureMainBtn" onclick="handleCaptureMainAction()"><i class="fas fa-camera" id="captureMainIcon"></i></button>
+        <button class="cap-btn cap-btn-secondary" id="captureUseBtn" onclick="useCapturedMedia()" disabled title="Use this"><i class="fas fa-check"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Official Record Configuration Overlay Modal -->
+  <div class="record-modal" id="recordFormModal">
+    <div class="record-modal-content">
+      <div class="record-modal-header">
+        <h4><i class="fas fa-clipboard-list" style="color: var(--accent-primary);"></i> Insert Official System Record</h4>
+        <button onclick="closeRecordModal()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:16px;"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="form-group">
+        <label>Record Category/Header</label>
+        <input type="text" id="recordHeaderTitle" placeholder="e.g. DISCIPLINARY / ATTENDANCE / FEES LOG" />
+      </div>
+      <div class="form-group">
+        <label>Official Transcript/Notes Statement</label>
+        <textarea id="recordNotesBody" rows="4" placeholder="Type official administrative data logs here..."></textarea>
+      </div>
+      <div class="record-modal-footer">
+        <button onclick="closeRecordModal()" style="background: rgba(255,255,255,0.05); color:#fff; border:none; padding:10px 16px; border-radius:8px; cursor:pointer; font-size:13px;">Cancel</button>
+        <button onclick="commitOfficialRecordToChat()" style="background: var(--success); color:#fff; border:none; padding:10px 16px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600;">Save Record Node</button>
+      </div>
+    </div>
+  </div>
+
+  <footer style="margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-muted); font-size: 12px;">
+    Executive Console Control Architecture &copy; 2026 Crest Academy International.
+  </footer>
+
+  <script>
+    // ===========================================================
+    // SESSION GATE — redirect to login if not signed in.
+    // Checked immediately, before any page content runs.
+    // ===========================================================
+    const staffSessionRaw = sessionStorage.getItem('crest_staff_session');
+    if (!staffSessionRaw) {
+      window.location.href = 'login.html';
+    }
+    const staffSession = staffSessionRaw ? JSON.parse(staffSessionRaw) : null;
+
+    function logoutStaff() {
+      if (!confirm("Sign out of the admin console?")) return;
+      sessionStorage.removeItem('crest_staff_session');
+      window.location.href = 'login.html';
+    }
+
+    // MATCHED COHESIVE SYSTEM LEDGER CREDENTIALS
+    const API_KEY = "$2a$10$q1K8WzlWXgpkdX5BYcLBfuiYIdv7ZrDcy2OjEiGlXdWC2Y5/CB7e6";
+    const BIN_ID = "6a3e2279da38895dfe014a42";
+    const BASE_URL = "https://api.jsonbin.io/v3/b/" + BIN_ID;
+
+    // Staff accounts bin (used by login.html, and by the Manage Staff panel below)
+    const ACCOUNTS_BIN_ID = "6a438e08da38895dfe14f2bf";
+    const ACCOUNTS_BASE_URL = "https://api.jsonbin.io/v3/b/" + ACCOUNTS_BIN_ID;
+
+    // Separate bin just for live chat (books bin stays untouched by chat traffic)
+    const CHAT_BIN_ID = "6a4227f6da38895dfe0eb40f";
+    const CHAT_BASE_URL = "https://api.jsonbin.io/v3/b/" + CHAT_BIN_ID;
+
+    // Cloudinary credentials configuration
+    const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dfrnpdnld/auto/upload";
+    const CLOUDINARY_PRESET = "taydayo";
+    const CLOUDINARY_CHUNK_URL = "https://api.cloudinary.com/v1_1/dfrnpdnld/auto/upload"; // same endpoint, chunked via Content-Range
+    const CHUNK_SIZE = 20 * 1024 * 1024; // 20MB per chunk — Cloudinary's own default chunk size
+
+    // Uploads a file to Cloudinary in chunks. Required for video/audio so the upload
+    // doesn't time out or get cut off mid-transfer on a single big request — each
+    // chunk is sent, confirmed, then the next chunk goes. Falls back to a normal
+    // single-shot upload for small files (under one chunk) since chunking adds no benefit there.
+    async function uploadToCloudinaryChunked(file, onProgress) {
+      if (file.size <= CHUNK_SIZE) {
+        // Small file — plain upload is fine, no need to chunk.
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', CLOUDINARY_PRESET);
+        const res = await fetch(CLOUDINARY_URL, { method: 'POST', body: formData });
+        if (!res.ok) {
+          let detail = '';
+          try { detail = (await res.json()).error?.message || ''; } catch(e) {}
+          throw new Error(`Cloudinary upload failed (status ${res.status})${detail ? ': ' + detail : ''}`);
+        }
+        return await res.json();
+      }
+
+      // Cloudinary requires a unique ID to stitch chunks back together server-side.
+      const uniqueUploadId = 'crest-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
+      const totalSize = file.size;
+      let start = 0;
+      let lastResponse = null;
+
+      while (start < totalSize) {
+        const end = Math.min(start + CHUNK_SIZE, totalSize);
+        const chunk = file.slice(start, end);
+
+        const formData = new FormData();
+        formData.append('file', chunk, file.name);
+        formData.append('upload_preset', CLOUDINARY_PRESET);
+        formData.append('cloud_name', 'dfrnpdnld');
+
+        const res = await fetch(CLOUDINARY_CHUNK_URL, {
+          method: 'POST',
+          headers: {
+            'X-Unique-Upload-Id': uniqueUploadId,
+            'Content-Range': `bytes ${start}-${end - 1}/${totalSize}`
+          },
+          body: formData
+        });
+
+        if (!res.ok) {
+          let detail = '';
+          try { detail = (await res.json()).error?.message || ''; } catch(e) {}
+          throw new Error(`Cloudinary chunk upload failed at byte ${start} (status ${res.status})${detail ? ': ' + detail : ''}`);
+        }
+        lastResponse = await res.json();
+
+        if (onProgress) onProgress(Math.round((end / totalSize) * 100));
+        start = end;
+      }
+
+      // The final chunk's response contains the completed asset's secure_url.
+      return lastResponse;
+    }
+
+    let selectedFilesQueue = [];
+    
+    // Global state track configurations for active chat attachments
+    let stagedChatFile = null;
+    let stagedChatFileType = null; // 'image' | 'video' | 'audio' | 'document'
+
+    const localSubjects = {
+      primary: ["Mathematics", "English", "Chichewa", "Primary Science", "Social Studies", "Life Skills"],
+      secondary: ["Mathematics", "Physics", "Chemistry", "Biology", "English Literature", "History", "Geography", "Computer Science", "Business Studies", "Agriculture"],
+      tertiary: ["Computer Engineering", "Advanced Calculus", "Data Structures", "Business Management", "Medicine & Health", "Education"]
+    };
+
+    const localClasses = {
+      primary: ['Standard 1','Standard 2','Standard 3','Standard 4','Standard 5','Standard 6','Standard 7','Standard 8'],
+      secondary: ['Form 1','Form 2','Form 3','Form 4'],
+      tertiary: ['Year 1','Year 2','Year 3','Year 4']
+    };
+
+    function adaptFormAllocations() {
+      const lvl = document.getElementById('bookLevel').value;
+      
+      const classSelect = document.getElementById('bookClass');
+      classSelect.innerHTML = localClasses[lvl].map(c => `<option value="${c}">${c}</option>`).join('');
+
+      const subjSelect = document.getElementById('bookSubject');
+      subjSelect.innerHTML = localSubjects[lvl].map(s => `<option value="${s}">${s}</option>`).join('');
+    }
+
+    function toggleUploadMode() {
+      const mode = document.getElementById('uploadMode').value;
+      const icon = document.getElementById('uploadBoxIcon');
+      selectedFilesQueue = [];
+      document.getElementById('fileIndicator').style.display = 'none';
+      document.getElementById('uploadPromptText').style.display = 'block';
+      
+      if(mode === 'file') {
+        icon.className = "fa-solid fa-file-pdf";
+        document.getElementById('uploadPromptText').textContent = "Click here to select single resource file";
+      } else {
+        icon.className = "fa-solid fa-folder-open";
+        document.getElementById('uploadPromptText').textContent = "Click here to select resource folder cluster";
+      }
+    }
+
+    function triggerSystemFileBrowser() {
+      const mode = document.getElementById('uploadMode').value;
+      if (mode === 'file') {
+        document.getElementById('hiddenFileBrowser').click();
+      } else {
+        document.getElementById('hiddenFolderBrowser').click();
+      }
+    }
+
+    function handleFileSelection(e) {
+      const files = Array.from(e.target.files);
+      if(files.length === 0) return;
+      const file = files[0];
+      selectedFilesQueue = [file];
+
+      // Auto-detect subject + class + type from the filename itself (single-file mode has no folder context)
+      const level = document.getElementById('bookLevel').value;
+      const knownSubjects = localSubjects[level] || [];
+      const knownClasses = localClasses[level] || [];
+      file.detectedSubject = matchSubjectName(file.name, knownSubjects);
+      file.detectedClass = matchClassName(file.name, knownClasses);
+      file.detectedType = detectTypeFromFile(file);
+
+      // If we found a confident match, push it straight into the dropdowns so the
+      // person sees exactly where this file will be filed, and can override it if wrong.
+      if (file.detectedSubject) document.getElementById('bookSubject').value = file.detectedSubject;
+      if (file.detectedClass) document.getElementById('bookClass').value = file.detectedClass;
+      if (file.detectedType) document.getElementById('bookType').value = file.detectedType;
+
+      let info = `📄 File Verified: ${file.name} (${(file.size/1024).toFixed(1)} KB)`;
+      if (file.detectedSubject || file.detectedClass || file.detectedType) {
+        const tags = [file.detectedClass, file.detectedSubject, file.detectedType].filter(Boolean).join(' • ');
+        info += ` — 🎯 Detected: ${tags}`;
+      }
+      displayFileIndicator(info);
+
+      if(!document.getElementById('bookTitle').value.trim()) {
+        document.getElementById('bookTitle').value = file.name.replace(/\.[^/.]+$/, "");
+      }
+    }
+
+    function handleFolderSelection(e) {
+      const files = Array.from(e.target.files);
+      if (files.length === 0) return;
+      selectedFilesQueue = files.filter(f => !f.name.startsWith('.'));
+
+      // Auto-detect subject + class + type per file: check the subfolder name FIRST, then fall back
+      // to scanning the filename itself if the folder gave no confident match.
+      const level = document.getElementById('bookLevel').value;
+      const knownSubjects = localSubjects[level] || [];
+      const knownClasses = localClasses[level] || [];
+      let matchedCount = 0;
+
+      selectedFilesQueue.forEach(f => {
+        const relPath = f.webkitRelativePath || f.name;
+        const parts = relPath.split('/');
+        // parts[0] = root folder name, parts[1] = subfolder (if any) = likely the subject name
+        const subfolderName = parts.length > 2 ? parts[1] : null;
+
+        let subj = subfolderName ? matchSubjectName(subfolderName, knownSubjects) : null;
+        if (!subj) subj = matchSubjectName(f.name, knownSubjects); // fall back: scan the filename
+
+        let cls = subfolderName ? matchClassName(subfolderName, knownClasses) : null;
+        if (!cls) cls = matchClassName(relPath, knownClasses); // fall back: scan full path (covers root folder name too)
+
+        f.detectedSubject = subj;
+        f.detectedClass = cls;
+        if (f.detectedSubject || f.detectedClass) matchedCount++;
+
+        f.detectedType = detectTypeFromFile(f);
+      });
+
+      const totalSize = selectedFilesQueue.reduce((acc, f) => acc + f.size, 0);
+      let summary = `📁 Verified Cluster: ${selectedFilesQueue.length} files detected (${(totalSize / (1024 * 1024)).toFixed(2)} MB)`;
+      if (matchedCount > 0) {
+        summary += ` — 🎯 ${matchedCount} auto-sorted by subject`;
+      }
+      displayFileIndicator(summary);
+    }
+
+    // Matches a folder OR file name (e.g. "Biology", "Biology_PastPaper_2023.pdf") to the closest known subject
+    function matchSubjectName(rawName, knownSubjects) {
+      const clean = rawName.trim().toLowerCase().replace(/[\s_\-\.]+/g, '');
+      for (let subj of knownSubjects) {
+        const cleanSubj = subj.toLowerCase().replace(/[\s_\-\.]+/g, '');
+        if (clean === cleanSubj || clean.includes(cleanSubj)) {
+          return subj;
+        }
+      }
+      return null; // no confident match — caller will fall back to the dropdown value
+    }
+
+    // Matches a folder OR file name to the closest known class/form/standard/year
+    // e.g. "Mathematics_Form2_Book.pdf" -> "Form 2", "std4_chichewa_notes.pdf" -> "Standard 4"
+    function matchClassName(rawName, knownClasses) {
+      const clean = rawName.trim().toLowerCase().replace(/[\s_\-\.]+/g, '');
+      for (let cls of knownClasses) {
+        const cleanCls = cls.toLowerCase().replace(/[\s_\-\.]+/g, '');
+        if (clean === cleanCls || clean.includes(cleanCls)) {
+          return cls;
+        }
+      }
+      // Fallback: catch common abbreviations like "std4", "f2", "form2", "year3"
+      const abbrevMatch = clean.match(/(std|standard|f|form|yr|year)0*([1-8])/);
+      if (abbrevMatch) {
+        const num = abbrevMatch[2];
+        const prefix = abbrevMatch[1];
+        if (prefix.startsWith('std') || prefix === 'standard') {
+          const guess = `Standard ${num}`;
+          if (knownClasses.includes(guess)) return guess;
+        } else if (prefix === 'f' || prefix === 'form') {
+          const guess = `Form ${num}`;
+          if (knownClasses.includes(guess)) return guess;
+        } else if (prefix === 'yr' || prefix === 'year') {
+          const guess = `Year ${num}`;
+          if (knownClasses.includes(guess)) return guess;
+        }
+      }
+      return null;
+    }
+
+    // Auto-detect Resource Asset Category. Checks the FILENAME for keywords first
+    // (e.g. "past paper", "exam", "notes", "lesson"), then falls back to file extension.
+    function detectTypeFromFile(file) {
+      const nameClean = file.name.toLowerCase().replace(/[_\-\.]+/g, ' ');
+
+      const pastPaperKeywords = ['past paper', 'pastpaper', 'exam paper', 'examination', 'mock exam', 'msce', 'jce', 'pslce'];
+      const notesKeywords = ['notes', 'note ', 'summary', 'handout', 'revision'];
+      const videoKeywords = ['lesson', 'lecture', 'tutorial', 'masterclass', 'video'];
+      const bookKeywords = ['book', 'textbook', 'coursebook'];
+
+      if (pastPaperKeywords.some(k => nameClean.includes(k))) return 'Past Paper';
+      if (notesKeywords.some(k => nameClean.includes(k))) return 'Notes';
+      if (bookKeywords.some(k => nameClean.includes(k))) return 'Book';
+
+      const ext = file.name.split('.').pop().toLowerCase();
+      const videoExts = ['mp4', 'mov', 'avi', 'mkv', 'webm', 'm4v'];
+      const docExts = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'txt'];
+
+      if (videoExts.includes(ext)) return 'Video Lesson';
+      if (videoKeywords.some(k => nameClean.includes(k)) && docExts.includes(ext)) return 'Video Lesson'; // e.g. a transcript named "...lesson.pdf" still flagged as lesson content
+      if (docExts.includes(ext)) return 'Book';
+      return null; // unknown extension — fall back to dropdown value
+    }
+
+    function displayFileIndicator(msg) {
+      const indicator = document.getElementById('fileIndicator');
+      const text = document.getElementById('uploadPromptText');
+      text.style.display = 'none';
+      indicator.textContent = msg;
+      indicator.style.display = 'block';
+    }
+
+    async function getBooks() {
+      try {
+        const res = await fetch(BASE_URL + "/latest", {
+          headers: { "X-Master-Key": API_KEY, "X-Bin-Meta": "false" }
+        });
+        const data = await res.json();
+        return data.books || (Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error(err);
+        return [];
+      }
+    }
+
+    async function saveBooks(booksArray) {
+      await fetch(BASE_URL, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Master-Key": API_KEY
+        },
+        body: JSON.stringify({ books: booksArray })
+      });
+    }
+
+    // Chat now lives in its own JSONBin (not localStorage) so admin and student
+    // devices actually share the same conversation, and read-receipt ticks reflect
+    // real cross-device state instead of being purely local/cosmetic.
+    async function getChatHistory() {
+      try {
+        const res = await fetch(CHAT_BASE_URL + "/latest", {
+          headers: { "X-Master-Key": API_KEY, "X-Bin-Meta": "false" }
+        });
+        const data = await res.json();
+        return data.chat || (Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("Failed to fetch chat history:", err);
+        return [];
+      }
+    }
+
+    async function saveChatHistory(chatArray) {
+      try {
+        await fetch(CHAT_BASE_URL, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Master-Key": API_KEY
+          },
+          body: JSON.stringify({ chat: chatArray })
+        });
+      } catch (err) {
+        console.error("Failed to save chat history:", err);
+      }
+    }
+
+    function toggleFolderDisplay(id) {
+      const container = document.getElementById(id);
+      const icon = document.getElementById('icon-' + id);
+      if (container.style.display === "block") {
+        container.style.display = "none";
+        if(icon) icon.className = "fa-solid fa-folder";
+      } else {
+        container.style.display = "block";
+        if(icon) icon.className = "fa-solid fa-folder-open";
+      }
+    }
+
+    async function loadBookList() {
+      const listContainer = document.getElementById('bookList');
+      const books = await getBooks();
+      document.getElementById('catalogCount').textContent = books.length;
+
+      if (!books || books.length === 0) {
+        listContainer.innerHTML = '<p style="color:var(--text-muted);font-style:italic;font-size:13px;">Enterprise repository catalog empty.</p>';
+        return;
+      }
+
+      let directoryTree = { primary: {}, secondary: {}, tertiary: {} };
+
+      books.forEach((book, originalIndex) => {
+        const lv = book.level || 'secondary';
+        const cls = book.className || 'General';
+        const subj = book.subject || 'Uncategorized';
+        const ty = book.type || 'Book';
+
+        if (!directoryTree[lv]) directoryTree[lv] = {};
+        if (!directoryTree[lv][cls]) directoryTree[lv][cls] = {};
+        if (!directoryTree[lv][cls][subj]) directoryTree[lv][cls][subj] = {};
+        if (!directoryTree[lv][cls][subj][ty]) directoryTree[lv][cls][subj][ty] = [];
+
+        directoryTree[lv][cls][subj][ty].push({ ...book, index: originalIndex });
+      });
+
+      let treeHtml = '';
+      const tierLabels = { primary: 'Primary School Tier', secondary: 'Secondary School Tier', tertiary: 'Tertiary Advanced Level' };
+
+      for (let tier in directoryTree) {
+        let classesObj = directoryTree[tier];
+        let tierItemCount = 0;
+
+        for (let c in classesObj) {
+          for (let s in classesObj[c]) {
+            for (let t in classesObj[c][s]) { tierItemCount += classesObj[c][s][t].length; }
+          }
+        }
+        if (tierItemCount === 0) continue; 
+
+        let tierId = `tier-${tier}`;
+        treeHtml += `
+          <div class="folder-node">
+            <div class="folder-header" onclick="toggleFolderDisplay('${tierId}')">
+              <div class="folder-title-area"><i id="icon-${tierId}" class="fa-solid fa-folder"></i> ${tierLabels[tier]}</div>
+              <span class="folder-meta-count">${tierItemCount} items</span>
+            </div>
+            <div class="folder-contents" id="${tierId}">
+        `;
+
+        for (let className in classesObj) {
+          let subjectsObj = classesObj[className];
+          let classId = `class-${tier}-${className.replace(/\s+/g, '-')}`;
+          let classItemCount = 0;
+          for (let s in subjectsObj) { for (let t in subjectsObj[s]) { classItemCount += subjectsObj[s][t].length; } }
+
+          treeHtml += `
+            <div class="folder-node sub-folder">
+              <div class="folder-header" onclick="toggleFolderDisplay('${classId}')" style="background: #12193d;">
+                <div class="folder-title-area"><i id="icon-${classId}" class="fa-solid fa-folder" style="color: #60a5fa;"></i> ${className}</div>
+                <span class="folder-meta-count" style="background: rgba(96,165,250,0.15); color: #60a5fa;">${classItemCount} files</span>
+              </div>
+              <div class="folder-contents" id="${classId}" style="background: #0b112c;">
+          `;
+
+          for (let subjectName in subjectsObj) {
+            let typesObj = subjectsObj[subjectName];
+            let subjId = `subj-${tier}-${className.replace(/\s+/g, '-')}-${subjectName.replace(/\s+/g, '-')}`;
+            let subjItemCount = 0;
+            for (let t in typesObj) { subjItemCount += typesObj[t].length; }
+
+            treeHtml += `
+              <div class="folder-node sub-folder" style="border-left: 2px dashed rgba(245,158,11,0.25);">
+                <div class="folder-header" onclick="toggleFolderDisplay('${subjId}')" style="background: #151c40; padding: 11px 14px;">
+                  <div class="folder-title-area" style="font-size:13px;"><i id="icon-${subjId}" class="fa-solid fa-folder" style="color: #f59e0b;"></i> ${subjectName}</div>
+                  <span class="folder-meta-count" style="background: rgba(245,158,11,0.15); color: #f59e0b;">${subjItemCount} files</span>
+                </div>
+                <div class="folder-contents" id="${subjId}" style="background: #0a0f28;">
+            `;
+
+            for (let typeName in typesObj) {
+              let filesArray = typesObj[typeName];
+              let typeId = `type-${tier}-${className.replace(/\s+/g, '-')}-${subjectName.replace(/\s+/g, '-')}-${typeName.replace(/\s+/g, '-')}`;
+
+              treeHtml += `
+                <div class="folder-node sub-folder" style="border-left: 2px dashed rgba(16,185,129,0.2);">
+                  <div class="folder-header" onclick="toggleFolderDisplay('${typeId}')" style="background: #17204c; padding: 10px 14px;">
+                    <div class="folder-title-area" style="font-size:12px;"><i id="icon-${typeId}" class="fa-solid fa-folder" style="color: #10b981;"></i> ${typeName}s</div>
+                    <span class="folder-meta-count" style="background: rgba(16,185,129,0.15); color: #10b981; font-size:10px;">${filesArray.length}</span>
+                  </div>
+                  <div class="folder-contents" id="${typeId}" style="background: #0f163a; padding-left: 10px;">
+              `;
+
+              filesArray.forEach(b => {
+                treeHtml += `
+                  <div class="book-item">
+                    <div class="book-item-info">
+                      <h4>${b.title} <span style="font-size: 9px; color: var(--accent-primary); background:rgba(56,189,248,0.1); padding:1px 4px; border-radius:4px; margin-left:5px;">${b.syllabus || 'National'}</span></h4>
+                      <div class="book-meta">
+                        <span class="meta-tag"><i class="fa-solid fa-book-bookmark"></i> ${b.subject}</span>
+                      </div>
+                    </div>
+                    <button class="del-btn" onclick="deleteBook(${b.index}); event.stopPropagation();">
+                      <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                  </div>
+                `;
+              });
+
+              treeHtml += `</div></div>`;
+            }
+            treeHtml += `</div></div>`;
+          }
+          treeHtml += `</div></div>`;
+        }
+        treeHtml += `</div></div>`;
+      }
+
+      listContainer.innerHTML = treeHtml || '<p style="color:var(--text-muted);font-style:italic;font-size:13px;">No organized entries found.</p>';
+    }
+
+    async function executeResourceCloudDeployment() {
+      const titleInput = document.getElementById('bookTitle').value.trim();
+      const level = document.getElementById('bookLevel').value;
+      const className = document.getElementById('bookClass').value;
+      const subject = document.getElementById('bookSubject').value;
+      const type = document.getElementById('bookType').value;
+      const syllabus = document.getElementById('bookSyllabus').value;
+      const description = document.getElementById('bookDesc').value.trim();
+      const mode = document.getElementById('uploadMode').value;
+      const btn = document.getElementById('submitBtn');
+
+      if (selectedFilesQueue.length === 0) {
+        showStatus("⚠️ Allocation error: Asset selection targets are missing.", "danger");
+        return;
+      }
+
+      btn.disabled = true;
+      showStatus("🔄 Contacting CDN pipeline endpoint streams...", "success");
+
+      try {
+        let liveCatalog = await getBooks();
+
+        for (let file of selectedFilesQueue) {
+          showStatus(`🚀 Uploading: ${file.name}...`, "success");
+          const cloudData = await uploadToCloudinaryChunked(file, (pct) => {
+            showStatus(`🚀 Uploading: ${file.name}... ${pct}%`, "success");
+          });
+
+          const finalTitle = mode === 'folder' ? file.name.replace(/\.[^/.]+$/, "") : (titleInput || file.name.replace(/\.[^/.]+$/, ""));
+          const finalFileUrl = cloudData.secure_url;
+
+          // Use auto-detected class/subject/type from the folder's subfolder structure & filename keywords.
+          // Falls back to the dropdown selections if nothing was detected.
+          const finalClassName = file.detectedClass || className;
+          const finalSubject = file.detectedSubject || subject;
+          const finalType = file.detectedType || type;
+
+          const newResourceNode = {
+            title: finalTitle,
+            level: level,
+            className: finalClassName,
+            subject: finalSubject,
+            type: finalType,
+            syllabus: syllabus,
+            description: description || "Premium study reference framework.",
+            link: finalFileUrl,
+            timestamp: new Date().toISOString()
+          };
+          liveCatalog.push(newResourceNode);
+        }
+
+        showStatus("🚀 Finalizing data ledger sync matrix...", "success");
+        await saveBooks(liveCatalog);
+        showStatus("✅ Execution complete! Assets organized into database structures.", "success");
+        resetConsoleFormFields();
+        await loadBookList();
+      } catch (err) {
+        console.error(err);
+        showStatus(`❌ System internal crash: ${err.message}`, "danger");
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function deleteBook(index) {
+      if(!confirm("Purge selected target ledger from ecosystem matrix?")) return;
+      try {
+        let books = await getBooks();
+        books.splice(index, 1);
+        await saveBooks(books);
+        await loadBookList();
+      } catch(err) {
+        alert("Deletion failed: " + err.message);
+      }
+    }
+
+    function showStatus(msg, type) {
+      const status = document.getElementById('panelStatus');
+      status.className = `status-msg ${type}`;
+      status.textContent = msg;
+      status.style.display = "block";
+    }
+
+    function resetConsoleFormFields() {
+      document.getElementById('bookTitle').value = "";
+      document.getElementById('bookDesc').value = "";
+      selectedFilesQueue = [];
+      document.getElementById('fileIndicator').style.display = 'none';
+      document.getElementById('uploadPromptText').style.display = 'block';
+    }
+
+
+    // ==================================================================================
+    // EXTENDED ADMIN CHAT & RICH MEDIA UPLOAD CONTROL SYSTEM
+    // ==================================================================================
+
+    function toggleChatAttachmentMenu(event) {
+      event.stopPropagation();
+      const menu = document.getElementById('chatAttachDropdown');
+      const btn = document.getElementById('chatAttachBtn');
+      if(menu.style.display === 'flex') {
+        menu.style.display = 'none';
+        btn.classList.remove('active');
+      } else {
+        menu.style.display = 'flex';
+        btn.classList.add('active');
+      }
+    }
+
+    // Auto-close attachment tray on outside clicks
+    document.addEventListener('click', () => {
+      document.getElementById('chatAttachDropdown').style.display = 'none';
+      document.getElementById('chatAttachBtn').classList.remove('active');
+    });
+
+    function openRecordModal() {
+      document.getElementById('recordFormModal').style.display = 'flex';
+    }
+
+    function closeRecordModal() {
+      document.getElementById('recordFormModal').style.display = 'none';
+      document.getElementById('recordHeaderTitle').value = "";
+      document.getElementById('recordNotesBody').value = "";
+    }
+
+    function triggerChatCamera(mode) {
+      // Fallback path: native OS picker (used if live in-browser capture is unavailable)
+      if(mode === 'image') {
+        document.getElementById('chatCameraPhotoInput').click();
+      } else {
+        document.getElementById('chatCameraVideoInput').click();
+      }
+    }
+
+    // ==================================================================================
+    // LIVE IN-BROWSER CAPTURE SYSTEM: Camera Photo / Camera Video / Voice Note Recorder
+    // ==================================================================================
+
+    let liveCaptureMode = null;       // 'image' | 'video' | 'audio'
+    let liveMediaStream = null;       // active getUserMedia stream
+    let liveMediaRecorder = null;     // MediaRecorder instance for video/audio
+    let liveRecordedChunks = [];
+    let liveCapturedBlob = null;      // final blob ready to stage
+    let liveCapturedFileName = "";
+    let liveTimerInterval = null;
+    let liveTimerSeconds = 0;
+    let liveAudioCtx = null;
+    let liveAnalyser = null;
+    let liveVisualizerFrame = null;
+    let isCurrentlyRecording = false;
+
+    function openLiveCapture(mode) {
+      liveCaptureMode = mode;
+      resetCaptureUI();
+
+      const titleEl = document.getElementById('captureModalTitle');
+      const mainIcon = document.getElementById('captureMainIcon');
+      const stage = document.getElementById('captureStage');
+      stage.classList.remove('audio-stage');
+
+      if (mode === 'image') {
+        titleEl.innerHTML = '<i class="fas fa-camera" style="color:#ed4956;"></i> Take Photo';
+        mainIcon.className = 'fas fa-camera';
+        document.getElementById('captureModeLabel').textContent = "Position the shot, then tap to capture.";
+      } else if (mode === 'video') {
+        titleEl.innerHTML = '<i class="fas fa-video" style="color:#a855f7;"></i> Record Video';
+        mainIcon.className = 'fas fa-circle';
+        document.getElementById('captureModeLabel').textContent = "Tap to start recording.";
+      } else {
+        titleEl.innerHTML = '<i class="fas fa-microphone" style="color:#f59e0b;"></i> Record Voice Note';
+        mainIcon.className = 'fas fa-microphone';
+        stage.classList.add('audio-stage');
+        document.getElementById('captureModeLabel').textContent = "Tap to start recording your voice note.";
+      }
+
+      document.getElementById('liveCaptureModal').style.display = 'flex';
+      startLiveStream(mode);
+    }
+
+    async function startLiveStream(mode) {
+      const errorBox = document.getElementById('captureErrorBox');
+      errorBox.style.display = 'none';
+
+      try {
+        const constraints = mode === 'audio'
+          ? { audio: true }
+          : { video: { facingMode: 'environment' }, audio: mode === 'video' };
+
+        liveMediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+
+        if (mode === 'audio') {
+          setupMicVisualizer(liveMediaStream);
+        } else {
+          const videoEl = document.getElementById('captureLiveVideo');
+          videoEl.style.display = 'block';
+          videoEl.srcObject = liveMediaStream;
+        }
+      } catch (err) {
+        console.error("Live capture stream error:", err);
+        errorBox.textContent = "⚠️ Could not access " + (mode === 'audio' ? "microphone" : "camera") + " (" + err.message + "). Falling back to device picker.";
+        errorBox.style.display = 'block';
+        document.getElementById('captureControls').style.display = 'none';
+
+        // Graceful fallback to native OS capture pickers
+        setTimeout(() => {
+          closeLiveCapture();
+          if (mode === 'image' || mode === 'video') {
+            triggerChatCamera(mode);
+          } else {
+            alert("Microphone access unavailable. Please check browser permissions to record voice notes.");
+          }
+        }, 1400);
+      }
+    }
+
+    function setupMicVisualizer(stream) {
+      const stage = document.getElementById('captureStage');
+      let bars = stage.querySelector('.mic-visualizer');
+      if (!bars) {
+        bars = document.createElement('div');
+        bars.className = 'mic-visualizer';
+        for (let i = 0; i < 24; i++) {
+          const bar = document.createElement('div');
+          bar.className = 'bar';
+          bars.appendChild(bar);
+        }
+        stage.appendChild(bars);
+      }
+      bars.style.display = 'flex';
+
+      liveAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const source = liveAudioCtx.createMediaStreamSource(stream);
+      liveAnalyser = liveAudioCtx.createAnalyser();
+      liveAnalyser.fftSize = 64;
+      source.connect(liveAnalyser);
+
+      const dataArray = new Uint8Array(liveAnalyser.frequencyBinCount);
+      const barEls = bars.querySelectorAll('.bar');
+
+      function draw() {
+        liveAnalyser.getByteFrequencyData(dataArray);
+        barEls.forEach((bar, i) => {
+          const val = dataArray[i % dataArray.length] || 0;
+          bar.style.height = Math.max(8, (val / 255) * 70) + 'px';
+        });
+        liveVisualizerFrame = requestAnimationFrame(draw);
+      }
+      draw();
+    }
+
+    function handleCaptureMainAction() {
+      if (liveCaptureMode === 'image') {
+        snapPhoto();
+      } else {
+        // video or audio: toggle recording
+        if (!isCurrentlyRecording) {
+          startMediaRecording();
+        } else {
+          stopMediaRecording();
+        }
+      }
+    }
+
+    function snapPhoto() {
+      if (!liveMediaStream) return;
+      const videoEl = document.getElementById('captureLiveVideo');
+      const canvas = document.getElementById('capturePhotoCanvas');
+      canvas.width = videoEl.videoWidth || 640;
+      canvas.height = videoEl.videoHeight || 480;
+      canvas.getContext('2d').drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+
+      canvas.toBlob((blob) => {
+        liveCapturedBlob = blob;
+        liveCapturedFileName = `voice_capture_${Date.now()}.jpg`.replace('voice_', 'photo_');
+
+        const previewImg = document.getElementById('capturePhotoPreview');
+        previewImg.src = URL.createObjectURL(blob);
+        previewImg.style.display = 'block';
+        videoEl.style.display = 'none';
+        stopAllStreams(false);
+
+        document.getElementById('captureUseBtn').disabled = false;
+        document.getElementById('captureRetakeBtn').disabled = false;
+        document.getElementById('captureMainBtn').style.display = 'none';
+        document.getElementById('captureModeLabel').textContent = "Looks good? Use it or retake.";
+      }, 'image/jpeg', 0.92);
+    }
+
+    function startMediaRecording() {
+      if (!liveMediaStream) return;
+      liveRecordedChunks = [];
+
+      let mimeType = '';
+      if (liveCaptureMode === 'audio') {
+        mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : '';
+      } else {
+        mimeType = MediaRecorder.isTypeSupported('video/webm') ? 'video/webm' : '';
+      }
+
+      try {
+        liveMediaRecorder = mimeType ? new MediaRecorder(liveMediaStream, { mimeType }) : new MediaRecorder(liveMediaStream);
+      } catch (err) {
+        console.error(err);
+        document.getElementById('captureErrorBox').textContent = "⚠️ Recording could not start: " + err.message;
+        document.getElementById('captureErrorBox').style.display = 'block';
+        return;
+      }
+
+      liveMediaRecorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) liveRecordedChunks.push(e.data);
+      };
+      liveMediaRecorder.onstop = onRecordingStopped;
+
+      liveMediaRecorder.start();
+      isCurrentlyRecording = true;
+
+      document.getElementById('captureRecDot').classList.add('live');
+      document.getElementById('captureTimer').classList.add('live');
+      document.getElementById('captureMainBtn').classList.add('is-recording');
+      document.getElementById('captureMainIcon').className = 'fas fa-stop';
+      document.getElementById('captureModeLabel').textContent = liveCaptureMode === 'audio' ? "Recording your voice note…" : "Recording video…";
+
+      liveTimerSeconds = 0;
+      updateCaptureTimerDisplay();
+      liveTimerInterval = setInterval(() => {
+        liveTimerSeconds++;
+        updateCaptureTimerDisplay();
+      }, 1000);
+    }
+
+    function stopMediaRecording() {
+      if (liveMediaRecorder && liveMediaRecorder.state !== 'inactive') {
+        liveMediaRecorder.stop();
+      }
+      isCurrentlyRecording = false;
+      clearInterval(liveTimerInterval);
+      document.getElementById('captureRecDot').classList.remove('live');
+      document.getElementById('captureMainBtn').classList.remove('is-recording');
+    }
+
+    function onRecordingStopped() {
+      const mime = liveCaptureMode === 'audio' ? 'audio/webm' : 'video/webm';
+      liveCapturedBlob = new Blob(liveRecordedChunks, { type: mime });
+      const ext = liveCaptureMode === 'audio' ? 'webm' : 'webm';
+      liveCapturedFileName = `${liveCaptureMode === 'audio' ? 'voice_note' : 'video_capture'}_${Date.now()}.${ext}`;
+
+      stopAllStreams(false);
+
+      const url = URL.createObjectURL(liveCapturedBlob);
+
+      if (liveCaptureMode === 'video') {
+        const videoEl = document.getElementById('captureLiveVideo');
+        const previewEl = document.getElementById('captureVideoPreview');
+        videoEl.style.display = 'none';
+        previewEl.src = url;
+        previewEl.style.display = 'block';
+        previewEl.muted = false;
+      } else {
+        // Re-purpose hidden video preview element as a styled audio player on the stage
+        const stage = document.getElementById('captureStage');
+        let player = document.getElementById('captureAudioPlayer');
+        if (!player) {
+          player = document.createElement('audio');
+          player.id = 'captureAudioPlayer';
+          player.controls = true;
+          player.style.width = '85%';
+          stage.querySelector('.mic-visualizer')?.remove();
+          stage.appendChild(player);
+        }
+        player.src = url;
+        player.style.display = 'block';
+      }
+
+      document.getElementById('captureUseBtn').disabled = false;
+      document.getElementById('captureRetakeBtn').disabled = false;
+      document.getElementById('captureMainBtn').style.display = 'none';
+      document.getElementById('captureModeLabel').textContent = "Review your recording, then use it or retake.";
+    }
+
+    function updateCaptureTimerDisplay() {
+      const m = Math.floor(liveTimerSeconds / 60).toString().padStart(2, '0');
+      const s = (liveTimerSeconds % 60).toString().padStart(2, '0');
+      document.getElementById('captureTimer').textContent = `${m}:${s}`;
+    }
+
+    function retakeCapture() {
+      liveCapturedBlob = null;
+      resetCaptureUI();
+      startLiveStream(liveCaptureMode);
+    }
+
+    function useCapturedMedia() {
+      if (!liveCapturedBlob) return;
+
+      const file = new File([liveCapturedBlob], liveCapturedFileName, { type: liveCapturedBlob.type });
+      const typeKey = liveCaptureMode === 'image' ? 'image' : liveCaptureMode === 'video' ? 'video' : 'audio';
+
+      stagedChatFile = file;
+      stagedChatFileType = typeKey;
+
+      const banner = document.getElementById('chatStagingBanner');
+      const text = document.getElementById('chatStagingText');
+      let prefix = typeKey === 'image' ? '📸 Staged Photo: ' : typeKey === 'video' ? '🎥 Staged Video: ' : '🎙️ Staged Voice Note: ';
+      text.textContent = `${prefix}${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+      banner.style.display = 'flex';
+
+      closeLiveCapture();
+    }
+
+    function resetCaptureUI() {
+      stopAllStreams(true);
+
+      document.getElementById('captureLiveVideo').style.display = 'block';
+      document.getElementById('captureLiveVideo').srcObject = null;
+      document.getElementById('capturePhotoPreview').style.display = 'none';
+      document.getElementById('capturePhotoPreview').src = '';
+      document.getElementById('captureVideoPreview').style.display = 'none';
+      document.getElementById('captureVideoPreview').src = '';
+      document.getElementById('captureAudioPlayer')?.remove();
+      document.querySelector('#captureStage .mic-visualizer')?.remove();
+
+      document.getElementById('captureRecDot').classList.remove('live');
+      document.getElementById('captureTimer').classList.remove('live');
+      document.getElementById('captureTimer').textContent = '00:00';
+      document.getElementById('captureControls').style.display = 'flex';
+      document.getElementById('captureMainBtn').style.display = 'flex';
+      document.getElementById('captureMainBtn').classList.remove('is-recording');
+      document.getElementById('captureUseBtn').disabled = true;
+      document.getElementById('captureRetakeBtn').disabled = true;
+      document.getElementById('captureErrorBox').style.display = 'none';
+
+      liveTimerSeconds = 0;
+      isCurrentlyRecording = false;
+      clearInterval(liveTimerInterval);
+    }
+
+    function stopAllStreams(closeAudioCtx) {
+      if (liveMediaRecorder && liveMediaRecorder.state !== 'inactive') {
+        try { liveMediaRecorder.stop(); } catch(e) {}
+      }
+      liveMediaRecorder = null;
+
+      if (liveMediaStream) {
+        liveMediaStream.getTracks().forEach(track => track.stop());
+        liveMediaStream = null;
+      }
+
+      if (liveVisualizerFrame) {
+        cancelAnimationFrame(liveVisualizerFrame);
+        liveVisualizerFrame = null;
+      }
+
+      if (closeAudioCtx && liveAudioCtx) {
+        liveAudioCtx.close().catch(()=>{});
+        liveAudioCtx = null;
+      }
+    }
+
+    function closeLiveCapture() {
+      stopAllStreams(true);
+      clearInterval(liveTimerInterval);
+      document.getElementById('liveCaptureModal').style.display = 'none';
+      liveCapturedBlob = null;
+      liveCaptureMode = null;
+    }
+
+    function triggerChatDocumentUpload() {
+      document.getElementById('chatDocumentInput').click();
+    }
+
+    function handleChatFileStaging(event, type) {
+      const file = event.target.files[0];
+      if(!file) return;
+
+      stagedChatFile = file;
+      stagedChatFileType = type;
+
+      const banner = document.getElementById('chatStagingBanner');
+      const text = document.getElementById('chatStagingText');
+      
+      let prefix = type === 'image' ? '📸 Staged Photo: ' : type === 'video' ? '🎥 Staged Video: ' : '📄 Staged Doc: ';
+      text.textContent = `${prefix}${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+      banner.style.display = 'flex';
+    }
+
+    function clearStagedChatFile() {
+      stagedChatFile = null;
+      stagedChatFileType = null;
+      document.getElementById('chatStagingBanner').style.display = 'none';
+      document.getElementById('chatCameraPhotoInput').value = "";
+      document.getElementById('chatCameraVideoInput').value = "";
+      document.getElementById('chatDocumentInput').value = "";
+    }
+
+    let lastRenderedChatSignature = null; // tracks last-rendered chat state so we don't rebuild the DOM (and kill playing audio/video) when nothing changed
+
+    async function refreshAdminChatMesh() {
+      const messageLog = document.getElementById('adminChatMessagesLog');
+      let chatHistory = await getChatHistory();
+
+      // Skip the rebuild entirely if the chat hasn't changed since last poll.
+      // This is what stops a playing voice note / video from being yanked out
+      // from under the person every 4 seconds by the auto-refresh.
+      const signature = JSON.stringify(chatHistory.map(m => ({ t: m.time, s: m.sender, st: m.status })));
+      const changed = signature !== lastRenderedChatSignature;
+      lastRenderedChatSignature = signature;
+
+      // Admin is actively viewing this screen, so any student message not yet
+      // marked "read" gets marked now — this is what flips the sender's ticks
+      // from delivered (✓✓ grey) to read (✓✓ blue) on the student's side.
+      let needsStatusSave = false;
+      chatHistory.forEach(msg => {
+        if (!msg.isTeacher && !msg.isSystem && msg.status !== 'read') {
+          msg.status = 'read';
+          needsStatusSave = true;
+        }
+      });
+      if (needsStatusSave) {
+        saveChatHistory(chatHistory); // fire-and-forget; next poll will pick up confirmed state
+      }
+
+      if (!changed && !needsStatusSave) return;
+
+      if (chatHistory.length === 0) {
+        messageLog.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 12px; font-style: italic; padding: 40px 0;"><i class="fas fa-comments" style="font-size: 24px; display:block; margin-bottom: 8px; color: rgba(255,255,255,0.05);"></i> Communications line is pristine empty. No student traffic logged.</div>`;
+        return;
+      }
+
+      messageLog.innerHTML = chatHistory.map((msg, idx) => {
+        if(msg.isSystem) {
+          return `<div style="text-align: center; color: var(--text-muted); font-size: 11px; font-style: italic; background: rgba(255,255,255,0.02); padding: 8px; border-radius: 8px; border: 1px dashed rgba(255,255,255,0.05); width: 100%; max-width: 90%; margin: 0 auto;">${msg.message}</div>`;
+        }
+
+        const isFaculty = msg.isTeacher;
+        const bubbleBg = isFaculty ? 'rgba(56, 189, 248, 0.1)' : 'rgba(255, 255, 255, 0.04)';
+        const bubbleBorder = isFaculty ? 'border: 1px solid rgba(56, 189, 248, 0.25);' : 'border: 1px solid rgba(255,255,255,0.05);';
+        const alignSelf = isFaculty ? 'flex-end' : 'flex-start';
+        const radiusConfig = isFaculty ? 'border-radius: 16px 16px 2px 16px;' : 'border-radius: 16px 16px 16px 2px;';
+        const labelNameColor = isFaculty ? 'color: var(--accent-primary);' : 'color: #ef4444;';
+
+        // Deleted messages show a neutral placeholder instead of their original
+        // content — admin can delete ANY message (own or a student's).
+        if (msg.deleted) {
+          return `
+            <div style="display: flex; flex-direction: column; max-width: 80%; align-self: ${alignSelf}; gap: 3px;">
+              <span style="font-size: 10px; font-weight: 700; ${labelNameColor} text-transform: uppercase; letter-spacing: 0.03em;">${msg.sender}</span>
+              <div style="background: rgba(255,255,255,0.02); color: var(--text-muted); border: 1px dashed rgba(255,255,255,0.08); padding: 12px 16px; font-size: 12px; font-style: italic; ${radiusConfig}">
+                <i class="fas fa-ban" style="margin-right:6px;"></i> This message was deleted
+              </div>
+              <span style="font-size: 9px; color: var(--text-muted); align-self: ${isFaculty ? 'flex-end' : 'flex-start'}">${msg.time}</span>
+            </div>
+          `;
+        }
+
+        let dynamicContent = '';
+
+        // Dynamic multi-type renderer block
+        if (msg.recordData) {
+          dynamicContent = `
+            <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 12px; margin-top: 4px; min-width: 240px;">
+              <div style="font-size: 11px; font-weight:800; color:#10b981; text-transform:uppercase; margin-bottom:6px;"><i class="fas fa-folder-minus"></i> ${msg.recordData.header}</div>
+              <div style="font-size: 12px; color:#e2e8f0; line-height:1.4; white-space: pre-wrap;">${msg.recordData.notes}</div>
+            </div>`;
+        } else if (msg.callLink) {
+          dynamicContent = `
+            <a href="${msg.callLink}" target="_blank" style="display:flex; align-items:center; gap:10px; background: rgba(34,197,94,0.08); padding:12px 14px; border-radius:10px; text-decoration:none; color:#22c55e; font-size:13px; font-weight:700; border:1px solid rgba(34,197,94,0.25);">
+              <i class="fas fa-video" style="font-size:16px;"></i> Join Video Call
+            </a>`;
+        } else if (msg.audio) {
+          dynamicContent = `<div style="display:flex; align-items:center; gap:8px; margin-top:4px;"><i class="fas fa-microphone" style="color:#ef4444;"></i> <audio controls src="${msg.audio}" style="width: 220px; height: 32px; filter: invert(0.9) hue-rotate(180deg);"></audio></div>`;
+        } else if (msg.image) {
+          dynamicContent = `<div style="margin-top:5px;"><img src="${msg.image}" alt="Chat Upload" style="max-width: 240px; max-height:180px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); cursor:pointer;" onclick="window.open('${msg.image}','_blank')"></div>`;
+        } else if (msg.video) {
+          dynamicContent = `<div style="margin-top:5px;"><video controls src="${msg.video}" style="max-width: 240px; max-height:180px; border-radius:8px; border:1px solid rgba(255,255,255,0.1);"></video></div>`;
+        } else if (msg.document) {
+          dynamicContent = `
+            <a href="${msg.document}" target="_blank" style="display:flex; align-items:center; gap:10px; background: rgba(255,255,255,0.05); padding:10px; border-radius:8px; text-decoration:none; color:var(--accent-primary); font-size:12px; font-weight:600; margin-top:4px; border:1px solid rgba(56,189,248,0.15);">
+              <i class="fas fa-file-pdf" style="font-size:18px;"></i>
+              <span style="text-decoration:underline; word-break:break-all;">${msg.message || 'View Attached Document'}</span>
+            </a>`;
+        } else {
+          dynamicContent = msg.message;
+        }
+
+        // Ticks only show on messages faculty SENT — that's the side that needs to
+        // know whether the student got it. ✓ grey = sent only, ✓✓ grey = delivered
+        // (saved to the shared bin), ✓✓ blue = the student's screen has opened it.
+        let ticksHtml = '';
+        if (isFaculty) {
+          const status = msg.status || 'sent';
+          if (status === 'read') {
+            ticksHtml = `<i class="fas fa-check-double" style="color:#38bdf8; font-size:10px; margin-left:4px;"></i>`;
+          } else if (status === 'delivered') {
+            ticksHtml = `<i class="fas fa-check-double" style="color:var(--text-muted); font-size:10px; margin-left:4px;"></i>`;
+          } else {
+            ticksHtml = `<i class="fas fa-check" style="color:var(--text-muted); font-size:10px; margin-left:4px;"></i>`;
+          }
+        }
+
+        // Admin can delete any message (own or student's).
+        const deleteBtnHtml = `<button onclick="deleteChatMessage(${idx})" title="Delete message" style="background:none; border:none; color: var(--text-muted); cursor:pointer; font-size:11px; padding:2px 4px; opacity:0.5; transition: opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5"><i class="fas fa-trash-can"></i></button>`;
+
+        return `
+          <div style="display: flex; flex-direction: column; max-width: 80%; align-self: ${alignSelf}; gap: 3px;">
+            <div style="display:flex; align-items:center; gap:6px; ${isFaculty ? 'flex-direction: row-reverse;' : ''}">
+              <span style="font-size: 10px; font-weight: 700; ${labelNameColor} text-transform: uppercase; letter-spacing: 0.03em;">${msg.sender}</span>
+              ${deleteBtnHtml}
+            </div>
+            <div style="background: ${bubbleBg}; color: #fff; ${bubbleBorder} padding: 12px 16px; font-size: 13px; line-height: 1.5; ${radiusConfig}">
+              ${dynamicContent}
+            </div>
+            <span style="font-size: 9px; color: var(--text-muted); align-self: ${isFaculty ? 'flex-end' : 'flex-start'}">${msg.time}${ticksHtml}</span>
+          </div>
+        `;
+      }).join('');
+
+      messageLog.scrollTop = messageLog.scrollHeight;
+    }
+
+    // Admin can delete ANY message. Replaces it with a "deleted" placeholder
+    // (keeps the slot in the conversation rather than silently vanishing it).
+    async function deleteChatMessage(index) {
+      if (!confirm("Delete this message for everyone? This cannot be undone.")) return;
+      try {
+        let chatHistory = await getChatHistory();
+        if (!chatHistory[index]) return;
+        chatHistory[index].deleted = true;
+        delete chatHistory[index].message;
+        delete chatHistory[index].audio;
+        delete chatHistory[index].image;
+        delete chatHistory[index].video;
+        delete chatHistory[index].document;
+        delete chatHistory[index].recordData;
+        delete chatHistory[index].callLink;
+        await saveChatHistory(chatHistory);
+        lastRenderedChatSignature = null; // force a re-render even though only content (not time/sender/status) changed
+        await refreshAdminChatMesh();
+      } catch (err) {
+        alert("Failed to delete message: " + err.message);
+        console.error(err);
+      }
+    }
+
+    // Opens a fresh Google Meet room and drops the link into the chat as a styled
+    // "Join Call" invite. Real video/audio runs entirely on Google Meet's
+    // infrastructure — the chat is just carrying the invite link, the same way
+    // it carries any other message.
+    async function startVideoCallInvite() {
+      const meetWindow = window.open('https://meet.google.com/new', '_blank');
+      if (!meetWindow) {
+        alert("Please allow pop-ups for this site so the call window can open.");
+        return;
+      }
+
+      const callLink = prompt("Once your Google Meet room has opened in the new tab, copy its meeting link (it looks like meet.google.com/abc-defg-hij) and paste it here to send the invite to students:");
+      if (!callLink || !callLink.trim()) return;
+
+      const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      let chatHistory = await getChatHistory();
+      chatHistory.push({
+        sender: "Sir Taydayo (Dean of STEM)",
+        time: timestamp,
+        isTeacher: true,
+        status: "delivered",
+        callLink: callLink.trim()
+      });
+      await saveChatHistory(chatHistory);
+      lastRenderedChatSignature = null;
+      await refreshAdminChatMesh();
+    }
+
+    async function dispatchAdminChatMessage() {
+      const input = document.getElementById('adminChatInputField');
+      const text = input.value.trim();
+      const sendBtn = document.getElementById('adminChatSendBtn');
+      
+      // Stop execution if there is nothing input or staged
+      if (!text && !stagedChatFile) return;
+
+      const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      let chatHistory = await getChatHistory();
+      
+      let newMessageNode = {
+        sender: "Sir Taydayo (Dean of STEM)",
+        time: timestamp,
+        isTeacher: true,
+        status: "delivered" // saved straight to the shared bin, so the student's device can fetch it immediately on next poll
+      };
+
+      // Upload staged resource assets via the active media pipeline if verified
+      if (stagedChatFile) {
+        sendBtn.disabled = true;
+        input.placeholder = "Uploading resource pipeline to Cloudinary CDN...";
+        
+        try {
+          const cloudData = await uploadToCloudinaryChunked(stagedChatFile, (pct) => {
+            input.placeholder = `Uploading to Cloudinary CDN... ${pct}%`;
+          });
+          
+          if (stagedChatFileType === 'image') {
+            newMessageNode.image = cloudData.secure_url;
+            newMessageNode.message = text || "Image Attachment";
+          } else if (stagedChatFileType === 'video') {
+            newMessageNode.video = cloudData.secure_url;
+            newMessageNode.message = text || "Video Attachment";
+          } else if (stagedChatFileType === 'audio') {
+            newMessageNode.audio = cloudData.secure_url;
+            newMessageNode.message = text || "Voice Note";
+          } else if (stagedChatFileType === 'document') {
+            newMessageNode.document = cloudData.secure_url;
+            newMessageNode.message = text || stagedChatFile.name;
+          }
+        } catch (err) {
+          console.error(err);
+          alert("Chat resource upload breakdown: " + err.message);
+          sendBtn.disabled = false;
+          input.placeholder = "Type a message reply here...";
+          return;
+        }
+      } else {
+        newMessageNode.message = text;
+      }
+
+      chatHistory.push(newMessageNode);
+      await saveChatHistory(chatHistory);
+      
+      input.value = "";
+      input.placeholder = "Type a message reply here...";
+      sendBtn.disabled = false;
+      
+      clearStagedChatFile();
+      refreshAdminChatMesh();
+    }
+
+    async function commitOfficialRecordToChat() {
+      const header = document.getElementById('recordHeaderTitle').value.trim();
+      const notes = document.getElementById('recordNotesBody').value.trim();
+
+      if(!header || !notes) {
+        alert("Please complete both parameters to initialize system ledger log.");
+        return;
+      }
+
+      const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      let chatHistory = await getChatHistory();
+
+      chatHistory.push({
+        sender: "Sir Taydayo (Dean of STEM)",
+        time: timestamp,
+        isTeacher: true,
+        status: "delivered",
+        recordData: {
+          header: header,
+          notes: notes
+        }
+      });
+
+      await saveChatHistory(chatHistory);
+      closeRecordModal();
+      refreshAdminChatMesh();
+    }
+
+    // ===========================================================
+    // STAFF SESSION DISPLAY + MANAGE STAFF (root only)
+    // ===========================================================
+    async function getAccounts() {
+      try {
+        const res = await fetch(ACCOUNTS_BASE_URL + "/latest", {
+          headers: { "X-Master-Key": API_KEY, "X-Bin-Meta": "false" }
+        });
+        const data = await res.json();
+        return data.accounts || (Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("Failed to fetch accounts:", err);
+        return [];
+      }
+    }
+    async function saveAccounts(accountsArray) {
+      await fetch(ACCOUNTS_BASE_URL, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
+        body: JSON.stringify({ accounts: accountsArray })
+      });
+    }
+
+    function renderStaffHeader() {
+      if (!staffSession) return;
+      document.getElementById('staffNameDisplay').textContent = `${staffSession.firstName} ${staffSession.surname}`;
+      document.getElementById('staffRoleDisplay').textContent = staffSession.isRoot ? 'Root Administrator' : 'Staff Member';
+
+      if (staffSession.isRoot) {
+        document.getElementById('manageStaffSection').style.display = 'block';
+        renderStaffAccountsList();
+      }
+    }
+
+    async function renderStaffAccountsList() {
+      const container = document.getElementById('staffAccountsList');
+      const accounts = await getAccounts();
+
+      if (accounts.length === 0) {
+        container.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:12px; padding:20px 0;">No staff accounts yet.</div>`;
+        return;
+      }
+
+      const pending = accounts.filter(a => a.status === 'pending');
+      const others = accounts.filter(a => a.status !== 'pending');
+
+      let html = '';
+
+      if (pending.length > 0) {
+        html += `<div style="font-size:11px; font-weight:700; color:var(--warn); text-transform:uppercase; margin-bottom:10px;"><i class="fas fa-clock"></i> Pending Approval (${pending.length})</div>`;
+        html += pending.map(a => staffRowHtml(a, true)).join('');
+        html += `<div style="height:1px; background:var(--border-color); margin:18px 0;"></div>`;
+      }
+
+      html += `<div style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:10px;">All Staff</div>`;
+      html += others.map(a => staffRowHtml(a, false)).join('');
+
+      container.innerHTML = html;
+    }
+
+    function staffRowHtml(account, isPending) {
+      return `
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04); border-radius:10px; margin-bottom:8px; flex-wrap:wrap; gap:10px;">
+          <div>
+            <div style="font-size:13px; font-weight:700; color:#fff;">${account.firstName} ${account.surname} ${account.isRoot ? '<span style="color:var(--accent-primary); font-size:10px;">(Root)</span>' : ''}</div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">@${account.username} · ${account.phone} · ${account.status}</div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            ${isPending ? `
+              <button onclick="approveStaffAccount('${account.username}')" style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.25); color:var(--success); padding:7px 14px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;"><i class="fas fa-check"></i> Approve</button>
+              <button onclick="rejectStaffAccount('${account.username}')" style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.25); color:var(--danger); padding:7px 14px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;"><i class="fas fa-xmark"></i> Reject</button>
+            ` : !account.isRoot ? `
+              <button onclick="removeStaffAccount('${account.username}')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:13px; padding:4px 8px; opacity:0.6;" title="Remove account"><i class="fas fa-trash-can"></i></button>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    async function approveStaffAccount(username) {
+      const accounts = await getAccounts();
+      const acc = accounts.find(a => a.username === username);
+      if (acc) acc.status = 'approved';
+      await saveAccounts(accounts);
+      renderStaffAccountsList();
+    }
+
+    async function rejectStaffAccount(username) {
+      if (!confirm("Reject this account request?")) return;
+      const accounts = await getAccounts();
+      const acc = accounts.find(a => a.username === username);
+      if (acc) acc.status = 'rejected';
+      await saveAccounts(accounts);
+      renderStaffAccountsList();
+    }
+
+    async function removeStaffAccount(username) {
+      if (!confirm("Remove this staff account permanently? They will no longer be able to log in.")) return;
+      let accounts = await getAccounts();
+      accounts = accounts.filter(a => a.username !== username);
+      await saveAccounts(accounts);
+      renderStaffAccountsList();
+    }
+
+    // Active polling setup to dynamically fetch updates every 4 seconds
+    setInterval(refreshAdminChatMesh, 4000);
+
+    document.addEventListener("DOMContentLoaded", () => {
+      adaptFormAllocations();
+      loadBookList();
+      renderStaffHeader();
+    });
+  </script>
+</body>
+</html>

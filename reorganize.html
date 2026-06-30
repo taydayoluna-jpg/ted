@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Library Re-Organizer — Crest Academy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-main: #060814;
+      --bg-card: #0b112c;
+      --bg-input: #12193d;
+      --accent-primary: #38bdf8;
+      --accent-hover: #0288d1;
+      --text-main: #f1f5f9;
+      --text-muted: #64748b;
+      --border-color: rgba(56, 189, 248, 0.15);
+      --success: #10b981;
+      --danger: #ef4444;
+      --warn: #f59e0b;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+    body { background-color: var(--bg-main); color: var(--text-main); padding: 40px 5%; max-width: 1000px; margin: 0 auto; }
+    h1 { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
+    h1 span { color: var(--accent-primary); }
+    .sub { color: var(--text-muted); font-size: 13px; margin-bottom: 30px; }
+
+    .panel-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); margin-bottom: 25px; }
+    .panel-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 16px; color: #fff; display:flex; align-items:center; gap:10px; }
+
+    .action-btn { padding: 14px 24px; background: linear-gradient(135deg, var(--accent-hover), var(--accent-primary)); color: #040714; border: none; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 4px 20px rgba(56,189,248,0.25); }
+    .action-btn:hover { transform: translateY(-2px); }
+    .action-btn:disabled { background: var(--bg-input); color: var(--text-muted); cursor: not-allowed; transform: none; box-shadow:none; }
+    .action-btn.danger { background: linear-gradient(135deg, #b91c1c, var(--danger)); }
+    .action-btn.ghost { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border-color); box-shadow:none; }
+
+    .status-msg { margin-top: 15px; padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 500; }
+    .status-msg.success { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); color: var(--success); }
+    .status-msg.danger { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: var(--danger); }
+    .status-msg.info { background: rgba(56,189,248,0.08); border: 1px solid rgba(56,189,248,0.2); color: var(--accent-primary); }
+
+    .diff-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
+    .diff-table th { text-align:left; color: var(--text-muted); text-transform: uppercase; font-size: 10px; letter-spacing: 0.05em; padding: 8px 10px; border-bottom: 1px solid var(--border-color); }
+    .diff-table td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: top; }
+    .diff-table tr:hover { background: rgba(255,255,255,0.02); }
+    .field-old { color: var(--text-muted); text-decoration: line-through; display:block; }
+    .field-new { color: var(--success); font-weight:600; display:block; }
+    .field-same { color: var(--text-muted); }
+    .title-cell { max-width: 260px; word-break: break-word; color: #fff; font-weight:600; }
+    .no-change { text-align:center; color: var(--text-muted); font-style: italic; padding: 30px; }
+
+    .checkbox-row { display:flex; align-items:center; gap:10px; padding: 8px 0; }
+    .checkbox-row input { width:16px; height:16px; accent-color: var(--accent-primary); }
+
+    .spinner { width:14px; height:14px; border:2px solid rgba(255,255,255,0.2); border-top-color:#040714; border-radius:50%; animation: spin 0.7s linear infinite; display:inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .progress-bar-track { width:100%; height:8px; background: var(--bg-input); border-radius:6px; overflow:hidden; margin-top:14px; }
+    .progress-bar-fill { height:100%; background: linear-gradient(135deg, var(--accent-hover), var(--accent-primary)); width:0%; transition: width 0.3s; }
+  </style>
+</head>
+<body>
+
+  <h1>Library <span>Re-Organizer</span></h1>
+  <p class="sub">Re-scans every file already in your library and fixes its Level / Class / Subject / Type based on the file's title — same detection logic as the upload console. This only edits the catalog entries in JSONBin; it does not touch or re-upload the actual files on Cloudinary.</p>
+
+  <div class="panel-card">
+    <h3><i class="fas fa-magnifying-glass" style="color:var(--accent-primary);"></i> Step 1 — Scan</h3>
+    <p style="font-size:13px; color:var(--text-muted); margin-bottom:18px;">This only reads your library — nothing is changed yet. You'll see exactly what would change before anything is saved.</p>
+    <button class="action-btn" id="scanBtn" onclick="runScan()"><i class="fas fa-radar"></i> Scan Library</button>
+    <div id="scanStatus"></div>
+  </div>
+
+  <div class="panel-card" id="resultsPanel" style="display:none;">
+    <h3><i class="fas fa-list-check" style="color:var(--warn);"></i> Step 2 — Review Changes</h3>
+    <div id="resultsSummary"></div>
+    <div id="diffContainer"></div>
+  </div>
+
+  <div class="panel-card" id="applyPanel" style="display:none;">
+    <h3><i class="fas fa-floppy-disk" style="color:var(--success);"></i> Step 3 — Apply</h3>
+    <p style="font-size:13px; color:var(--text-muted); margin-bottom:18px;">This will overwrite your library catalog in JSONBin with the corrected values above. Nothing else (titles, links, descriptions) is touched.</p>
+    <button class="action-btn" id="applyBtn" onclick="applyChanges()"><i class="fas fa-check"></i> Apply Fixes to Library</button>
+    <div id="applyStatus"></div>
+  </div>
+
+  <script>
+    // Same credentials as admin.html — points at the SAME books bin (not the chat bin).
+    const API_KEY = "$2a$10$q1K8WzlWXgpkdX5BYcLBfuiYIdv7ZrDcy2OjEiGlXdWC2Y5/CB7e6";
+    const BIN_ID = "6a3e2279da38895dfe014a42";
+    const BASE_URL = "https://api.jsonbin.io/v3/b/" + BIN_ID;
+
+    const localSubjects = {
+      primary: ["Mathematics", "English", "Chichewa", "Primary Science", "Social Studies", "Life Skills"],
+      secondary: ["Mathematics", "Physics", "Chemistry", "Biology", "English Literature", "History", "Geography", "Computer Science", "Business Studies", "Agriculture"],
+      tertiary: ["Computer Engineering", "Advanced Calculus", "Data Structures", "Business Management", "Medicine & Health", "Education"]
+    };
+    const localClasses = {
+      primary: ['Standard 1','Standard 2','Standard 3','Standard 4','Standard 5','Standard 6','Standard 7','Standard 8'],
+      secondary: ['Form 1','Form 2','Form 3','Form 4'],
+      tertiary: ['Year 1','Year 2','Year 3','Year 4']
+    };
+    const ALL_LEVELS = ['primary', 'secondary', 'tertiary'];
+
+    // ---- Detection logic, ported from admin.html to work off a title string + url ----
+    // (admin.html's versions take a browser File object; library entries only have
+    // a title and a Cloudinary link, so these versions accept plain strings instead.)
+
+    function matchSubjectName(rawName, knownSubjects) {
+      const clean = rawName.trim().toLowerCase().replace(/[\s_\-\.]+/g, '');
+      for (let subj of knownSubjects) {
+        const cleanSubj = subj.toLowerCase().replace(/[\s_\-\.]+/g, '');
+        if (clean === cleanSubj || clean.includes(cleanSubj)) return subj;
+      }
+      return null;
+    }
+
+    function matchClassName(rawName, knownClasses) {
+      const clean = rawName.trim().toLowerCase().replace(/[\s_\-\.]+/g, '');
+      for (let cls of knownClasses) {
+        const cleanCls = cls.toLowerCase().replace(/[\s_\-\.]+/g, '');
+        if (clean === cleanCls || clean.includes(cleanCls)) return cls;
+      }
+      const abbrevMatch = clean.match(/(std|standard|f|form|yr|year)0*([1-8])/);
+      if (abbrevMatch) {
+        const num = abbrevMatch[2];
+        const prefix = abbrevMatch[1];
+        if (prefix.startsWith('std') || prefix === 'standard') {
+          const guess = `Standard ${num}`;
+          if (knownClasses.includes(guess)) return guess;
+        } else if (prefix === 'f' || prefix === 'form') {
+          const guess = `Form ${num}`;
+          if (knownClasses.includes(guess)) return guess;
+        } else if (prefix === 'yr' || prefix === 'year') {
+          const guess = `Year ${num}`;
+          if (knownClasses.includes(guess)) return guess;
+        }
+      }
+      return null;
+    }
+
+    function extractExtensionFromUrl(url) {
+      if (!url) return '';
+      const clean = url.split('?')[0].split('#')[0];
+      const last = clean.split('/').pop() || '';
+      const dot = last.lastIndexOf('.');
+      return dot >= 0 ? last.slice(dot + 1).toLowerCase() : '';
+    }
+
+    function detectTypeFromTitle(title, url) {
+      const nameClean = (title || '').toLowerCase().replace(/[_\-\.]+/g, ' ');
+
+      const pastPaperKeywords = ['past paper', 'pastpaper', 'exam paper', 'examination', 'mock exam', 'msce', 'jce', 'pslce'];
+      const notesKeywords = ['notes', 'note ', 'summary', 'handout', 'revision'];
+      const videoKeywords = ['lesson', 'lecture', 'tutorial', 'masterclass', 'video'];
+      const bookKeywords = ['book', 'textbook', 'coursebook'];
+
+      if (pastPaperKeywords.some(k => nameClean.includes(k))) return 'Past Paper';
+      if (notesKeywords.some(k => nameClean.includes(k))) return 'Notes';
+      if (bookKeywords.some(k => nameClean.includes(k))) return 'Book';
+
+      const ext = extractExtensionFromUrl(url);
+      const videoExts = ['mp4', 'mov', 'avi', 'mkv', 'webm', 'm4v'];
+      const docExts = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'txt'];
+
+      if (videoExts.includes(ext)) return 'Video Lesson';
+      if (videoKeywords.some(k => nameClean.includes(k)) && docExts.includes(ext)) return 'Video Lesson';
+      if (docExts.includes(ext)) return 'Book';
+      return null;
+    }
+
+    // Tries to detect level too, by checking the title against EVERY level's subject
+    // and class lists (a book's level isn't always obvious otherwise).
+    function detectLevelFromTitle(title) {
+      for (let lvl of ALL_LEVELS) {
+        if (matchClassName(title, localClasses[lvl])) return lvl;
+        if (matchSubjectName(title, localSubjects[lvl])) return lvl;
+      }
+      return null;
+    }
+
+    let scannedBooks = [];
+    let proposedChanges = []; // { index, book, newFields: {level, className, subject, type} }
+
+    async function getBooks() {
+      const res = await fetch(BASE_URL + "/latest", {
+        headers: { "X-Master-Key": API_KEY, "X-Bin-Meta": "false" }
+      });
+      const data = await res.json();
+      return data.books || (Array.isArray(data) ? data : []);
+    }
+
+    async function saveBooks(booksArray) {
+      await fetch(BASE_URL, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
+        body: JSON.stringify({ books: booksArray })
+      });
+    }
+
+    function showScanStatus(msg, type) {
+      document.getElementById('scanStatus').innerHTML = `<div class="status-msg ${type}">${msg}</div>`;
+    }
+
+    async function runScan() {
+      const btn = document.getElementById('scanBtn');
+      btn.disabled = true;
+      btn.innerHTML = `<span class="spinner"></span> Scanning...`;
+      showScanStatus('🔍 Fetching library catalog...', 'info');
+
+      try {
+        scannedBooks = await getBooks();
+        proposedChanges = [];
+
+        scannedBooks.forEach((book, index) => {
+          const title = book.title || '';
+          const currentLevel = book.level;
+          const knownSubjectsForLevel = localSubjects[currentLevel] || [];
+          const knownClassesForLevel = localClasses[currentLevel] || [];
+
+          // Try detection within the book's existing level first (most reliable —
+          // we don't want to bounce a correctly-leveled book to a wrong level just
+          // because a keyword coincidentally matches elsewhere).
+          let detectedSubject = matchSubjectName(title, knownSubjectsForLevel);
+          let detectedClass = matchClassName(title, knownClassesForLevel);
+          let detectedType = detectTypeFromTitle(title, book.link);
+          let detectedLevel = currentLevel;
+
+          // If the level itself looks missing/invalid, or nothing matched within
+          // it, try detecting the level fresh from the title.
+          if (!ALL_LEVELS.includes(currentLevel) || (!detectedSubject && !detectedClass)) {
+            const freshLevel = detectLevelFromTitle(title);
+            if (freshLevel && freshLevel !== currentLevel) {
+              detectedLevel = freshLevel;
+              detectedSubject = matchSubjectName(title, localSubjects[freshLevel]) || detectedSubject;
+              detectedClass = matchClassName(title, localClasses[freshLevel]) || detectedClass;
+            }
+          }
+
+          const newFields = {};
+          if (detectedLevel && detectedLevel !== book.level) newFields.level = detectedLevel;
+          if (detectedClass && detectedClass !== book.className) newFields.className = detectedClass;
+          if (detectedSubject && detectedSubject !== book.subject) newFields.subject = detectedSubject;
+          if (detectedType && detectedType !== book.type) newFields.type = detectedType;
+
+          if (Object.keys(newFields).length > 0) {
+            proposedChanges.push({ index, book, newFields });
+          }
+        });
+
+        renderResults();
+        showScanStatus(`✅ Scan complete — checked ${scannedBooks.length} entries.`, 'success');
+      } catch (err) {
+        console.error(err);
+        showScanStatus(`❌ Scan failed: ${err.message}`, 'danger');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fas fa-radar"></i> Re-Scan Library`;
+      }
+    }
+
+    function fieldRow(label, oldVal, newVal) {
+      if (newVal === undefined) return `<span class="field-same">${oldVal || '—'}</span>`;
+      return `<span class="field-old">${oldVal || '—'}</span><span class="field-new">${newVal}</span>`;
+    }
+
+    function renderResults() {
+      const resultsPanel = document.getElementById('resultsPanel');
+      const applyPanel = document.getElementById('applyPanel');
+      const summary = document.getElementById('resultsSummary');
+      const container = document.getElementById('diffContainer');
+
+      resultsPanel.style.display = 'block';
+
+      if (proposedChanges.length === 0) {
+        summary.innerHTML = `<div class="status-msg success">🎉 Nothing to fix — every entry is already correctly categorized.</div>`;
+        container.innerHTML = '';
+        applyPanel.style.display = 'none';
+        return;
+      }
+
+      summary.innerHTML = `<div class="status-msg info">Found <strong>${proposedChanges.length}</strong> entr${proposedChanges.length === 1 ? 'y' : 'ies'} that can be re-categorized out of ${scannedBooks.length} total.</div>`;
+
+      let rows = proposedChanges.map(change => {
+        const b = change.book;
+        const nf = change.newFields;
+        return `
+          <tr>
+            <td><span class="checkbox-row"><input type="checkbox" class="change-checkbox" data-index="${change.index}" checked></span></td>
+            <td class="title-cell">${b.title || '(untitled)'}</td>
+            <td>${fieldRow('Level', b.level, nf.level)}</td>
+            <td>${fieldRow('Class', b.className, nf.className)}</td>
+            <td>${fieldRow('Subject', b.subject, nf.subject)}</td>
+            <td>${fieldRow('Type', b.type, nf.type)}</td>
+          </tr>`;
+      }).join('');
+
+      container.innerHTML = `
+        <table class="diff-table">
+          <thead><tr><th></th><th>Title</th><th>Level</th><th>Class</th><th>Subject</th><th>Type</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+
+      applyPanel.style.display = 'block';
+      document.getElementById('applyStatus').innerHTML = '';
+    }
+
+    async function applyChanges() {
+      const btn = document.getElementById('applyBtn');
+      const checkboxes = document.querySelectorAll('.change-checkbox:checked');
+      const selectedIndexes = new Set(Array.from(checkboxes).map(cb => parseInt(cb.dataset.index)));
+
+      if (selectedIndexes.size === 0) {
+        document.getElementById('applyStatus').innerHTML = `<div class="status-msg danger">No changes selected — tick at least one row first.</div>`;
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = `<span class="spinner"></span> Applying...`;
+      document.getElementById('applyStatus').innerHTML = `<div class="status-msg info">🔄 Fetching latest catalog before saving (in case it changed since scan)...</div>`;
+
+      try {
+        // Re-fetch fresh in case admin uploaded something new since the scan ran —
+        // we only ever touch the specific entries the person approved, by matching
+        // on title + link (stable identifiers) rather than array position.
+        let liveBooks = await getBooks();
+
+        proposedChanges.forEach(change => {
+          if (!selectedIndexes.has(change.index)) return;
+          const match = liveBooks.find(b => b.title === change.book.title && b.link === change.book.link);
+          if (match) Object.assign(match, change.newFields);
+        });
+
+        await saveBooks(liveBooks);
+        document.getElementById('applyStatus').innerHTML = `<div class="status-msg success">✅ Applied ${selectedIndexes.size} fix(es) to the live library. Refresh your admin console or student site to see the updated folders.</div>`;
+        document.getElementById('applyBtn').style.display = 'none';
+      } catch (err) {
+        console.error(err);
+        document.getElementById('applyStatus').innerHTML = `<div class="status-msg danger">❌ Failed to save: ${err.message}</div>`;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fas fa-check"></i> Apply Fixes to Library`;
+      }
+    }
+  </script>
+</body>
+</html>

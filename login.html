@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Staff Login — Crest Academy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-main: #040714;
+      --bg-card: #0b112c;
+      --bg-input: #12193d;
+      --accent-primary: #38bdf8;
+      --accent-hover: #0288d1;
+      --text-main: #f1f5f9;
+      --text-muted: #64748b;
+      --border-color: rgba(56, 189, 248, 0.15);
+      --success: #10b981;
+      --danger: #ef4444;
+      --warn: #f59e0b;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+    body { background-color: var(--bg-main); color: var(--text-main); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+
+    .auth-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 36px; width: 100%; max-width: 420px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+    .auth-card h1 { font-size: 18px; font-weight: 800; text-align: center; margin-bottom: 4px; }
+    .auth-card h1 span { color: var(--accent-primary); }
+    .auth-sub { text-align:center; font-size: 12px; color: var(--text-muted); margin-bottom: 26px; }
+
+    .form-group { display:flex; flex-direction:column; gap:6px; margin-bottom: 14px; }
+    .form-group label { font-size: 11px; font-weight: 700; color: var(--accent-primary); text-transform: uppercase; letter-spacing: 0.05em; }
+    .form-group input {
+      width:100%; padding: 12px 14px; background: var(--bg-input); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px; color: #fff; font-size: 13px; outline: none; font-family: 'Poppins', sans-serif; transition: all 0.2s;
+    }
+    .form-group input:focus { border-color: var(--accent-primary); background: #16204d; }
+    .hint { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .hint.bad { color: var(--danger); }
+    .hint.good { color: var(--success); }
+
+    .action-btn { width:100%; padding: 13px 20px; background: linear-gradient(135deg, var(--accent-hover), var(--accent-primary)); color: #040714; border: none; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; display:flex; align-items:center; justify-content:center; gap: 10px; margin-top: 6px; box-shadow: 0 4px 20px rgba(56,189,248,0.25); }
+    .action-btn:hover { transform: translateY(-2px); }
+    .action-btn:disabled { background: var(--bg-input); color: var(--text-muted); cursor: not-allowed; transform:none; box-shadow:none; }
+
+    .status-msg { margin-top: 14px; padding: 12px; border-radius: 10px; font-size: 12px; font-weight: 500; }
+    .status-msg.success { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); color: var(--success); }
+    .status-msg.danger { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: var(--danger); }
+    .status-msg.info { background: rgba(56,189,248,0.08); border: 1px solid rgba(56,189,248,0.2); color: var(--accent-primary); }
+
+    .switch-link { text-align:center; font-size: 12px; color: var(--text-muted); margin-top: 18px; }
+    .switch-link a { color: var(--accent-primary); cursor: pointer; font-weight: 600; text-decoration: none; }
+
+    .spinner { width:14px; height:14px; border:2px solid rgba(255,255,255,0.2); border-top-color:#040714; border-radius:50%; animation: spin 0.7s linear infinite; display:inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .setup-banner { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); border-radius: 12px; padding: 14px; font-size: 12px; color: var(--warn); margin-bottom: 20px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+
+  <div class="auth-card">
+    <h1>CREST ACADEMY<span>.</span></h1>
+    <p class="auth-sub" id="cardSubtitle">Faculty Executive Console — Staff Login</p>
+    <div id="authRoot"></div>
+  </div>
+
+  <script>
+    const API_KEY = "$2a$10$q1K8WzlWXgpkdX5BYcLBfuiYIdv7ZrDcy2OjEiGlXdWC2Y5/CB7e6";
+    const ACCOUNTS_BIN_ID = "6a438e08da38895dfe14f2bf";
+    const ACCOUNTS_BASE_URL = "https://api.jsonbin.io/v3/b/" + ACCOUNTS_BIN_ID;
+
+    // ===========================================================
+    // DATA HELPERS
+    // ===========================================================
+    async function getAccounts() {
+      try {
+        const res = await fetch(ACCOUNTS_BASE_URL + "/latest", {
+          headers: { "X-Master-Key": API_KEY, "X-Bin-Meta": "false" }
+        });
+        const data = await res.json();
+        return data.accounts || (Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("Failed to fetch accounts:", err);
+        return [];
+      }
+    }
+
+    async function saveAccounts(accountsArray) {
+      await fetch(ACCOUNTS_BASE_URL, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
+        body: JSON.stringify({ accounts: accountsArray })
+      });
+    }
+
+    // SHA-256 hash via the browser's built-in Web Crypto API — passwords are
+    // never stored or transmitted in plain text. Note: this is client-side
+    // hashing on a serverless setup, which deters casual access but isn't
+    // bank-grade security (see conversation notes — by design tradeoff).
+    async function hashPassword(plainText) {
+      const enc = new TextEncoder().encode(plainText);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', enc);
+      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // ===========================================================
+    // VALIDATION RULES
+    // ===========================================================
+    function validatePassword(pw) {
+      if (pw.length <= 6) return "Password must be MORE than 6 characters.";
+      if (!/[a-zA-Z]/.test(pw)) return "Password must include at least one letter.";
+      if (!/[0-9]/.test(pw)) return "Password must include at least one number.";
+      return null;
+    }
+    function validatePhone(phone) {
+      const digitsOnly = phone.replace(/\D/g, '');
+      if (digitsOnly.length !== 10) return "Phone number must be exactly 10 digits.";
+      return null;
+    }
+    function validateName(name, label) {
+      if (!name.trim() || name.trim().length < 2) return `${label} is required.`;
+      return null;
+    }
+    function validateUsername(username) {
+      if (!username.trim() || username.trim().length < 3) return "Username must be at least 3 characters.";
+      if (!/^[a-zA-Z0-9_.]+$/.test(username.trim())) return "Username can only contain letters, numbers, dots, and underscores.";
+      return null;
+    }
+
+    // ===========================================================
+    // SESSION HELPERS — shared with admin.html via localStorage
+    // ===========================================================
+    function setSession(account) {
+      sessionStorage.setItem('crest_staff_session', JSON.stringify({
+        username: account.username,
+        firstName: account.firstName,
+        surname: account.surname,
+        isRoot: account.isRoot || false,
+        loginAt: new Date().toISOString()
+      }));
+    }
+
+    // ===========================================================
+    // ROOT BOOTSTRAP CHECK — first-ever account becomes root admin
+    // ===========================================================
+    let cachedAccounts = [];
+
+    async function init() {
+      const root = document.getElementById('authRoot');
+      root.innerHTML = `<div style="text-align:center; padding: 20px 0; color: var(--text-muted); font-size:12px;"><span class="spinner" style="border-top-color:var(--accent-primary);"></span> Checking system status...</div>`;
+
+      cachedAccounts = await getAccounts();
+
+      if (cachedAccounts.length === 0) {
+        renderRootSetupForm();
+      } else {
+        renderLoginForm();
+      }
+    }
+
+    // ===========================================================
+    // ROOT SETUP — runs only once, when no accounts exist yet
+    // ===========================================================
+    function renderRootSetupForm() {
+      document.getElementById('cardSubtitle').textContent = 'First-Time Setup — Create Root Admin Account';
+      const root = document.getElementById('authRoot');
+      root.innerHTML = `
+        <div class="setup-banner"><i class="fas fa-shield-halved"></i> No staff accounts exist yet. The account you create here becomes the <strong>Root Administrator</strong> — only this account can approve new staff logins.</div>
+        <div class="form-group"><label>First Name</label><input type="text" id="suFirstName" placeholder="e.g. Tadala" /></div>
+        <div class="form-group"><label>Surname</label><input type="text" id="suSurname" placeholder="e.g. Phiri" /></div>
+        <div class="form-group"><label>Username</label><input type="text" id="suUsername" placeholder="e.g. taydayo" /></div>
+        <div class="form-group"><label>Phone Number (10 digits)</label><input type="text" id="suPhone" placeholder="e.g. 0991234567" maxlength="13" /></div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="suPassword" placeholder="6+ characters, with a letter and a number" oninput="liveValidatePassword('suPassword','suPwHint')" />
+          <div class="hint" id="suPwHint">Must be more than 6 characters, with at least 1 letter and 1 number.</div>
+        </div>
+        <button class="action-btn" id="setupBtn" onclick="submitRootSetup()"><i class="fas fa-shield-halved"></i> Create Root Admin Account</button>
+        <div id="setupStatus"></div>
+      `;
+    }
+
+    function liveValidatePassword(inputId, hintId) {
+      const pw = document.getElementById(inputId).value;
+      const hintEl = document.getElementById(hintId);
+      const err = validatePassword(pw);
+      if (!pw) {
+        hintEl.className = 'hint';
+        hintEl.textContent = 'Must be more than 6 characters, with at least 1 letter and 1 number.';
+      } else if (err) {
+        hintEl.className = 'hint bad';
+        hintEl.textContent = err;
+      } else {
+        hintEl.className = 'hint good';
+        hintEl.textContent = '✓ Password meets requirements.';
+      }
+    }
+
+    async function submitRootSetup() {
+      const firstName = document.getElementById('suFirstName').value.trim();
+      const surname = document.getElementById('suSurname').value.trim();
+      const username = document.getElementById('suUsername').value.trim();
+      const phone = document.getElementById('suPhone').value.trim();
+      const password = document.getElementById('suPassword').value;
+      const statusEl = document.getElementById('setupStatus');
+      const btn = document.getElementById('setupBtn');
+
+      const errors = [
+        validateName(firstName, 'First name'),
+        validateName(surname, 'Surname'),
+        validateUsername(username),
+        validatePhone(phone),
+        validatePassword(password)
+      ].filter(Boolean);
+
+      if (errors.length > 0) {
+        statusEl.innerHTML = `<div class="status-msg danger">${errors[0]}</div>`;
+        return;
+      }
+
+      btn.disabled = true;
+      statusEl.innerHTML = `<div class="status-msg info">🔄 Creating root admin account...</div>`;
+
+      try {
+        const passwordHash = await hashPassword(password);
+        const accounts = await getAccounts();
+
+        // Safety re-check: if another device already created the root account
+        // in the time it took this person to fill the form, don't create a
+        // second root — send them to login instead.
+        if (accounts.length > 0) {
+          statusEl.innerHTML = `<div class="status-msg info">A root admin already exists. Redirecting to login...</div>`;
+          setTimeout(renderLoginForm, 1200);
+          return;
+        }
+
+        accounts.push({
+          username, firstName, surname, phone,
+          passwordHash,
+          isRoot: true,
+          status: 'approved',
+          createdAt: new Date().toISOString()
+        });
+
+        await saveAccounts(accounts);
+        statusEl.innerHTML = `<div class="status-msg success">✅ Root admin account created! Redirecting to your console...</div>`;
+        setSession(accounts[0]);
+        setTimeout(() => { window.location.href = 'admin.html'; }, 1000);
+      } catch (err) {
+        statusEl.innerHTML = `<div class="status-msg danger">❌ Failed: ${err.message}</div>`;
+        btn.disabled = false;
+        console.error(err);
+      }
+    }
+
+    // ===========================================================
+    // LOGIN FORM
+    // ===========================================================
+    function renderLoginForm() {
+      document.getElementById('cardSubtitle').textContent = 'Faculty Executive Console — Staff Login';
+      const root = document.getElementById('authRoot');
+      root.innerHTML = `
+        <div class="form-group"><label>Username</label><input type="text" id="liUsername" placeholder="Your username" /></div>
+        <div class="form-group"><label>Password</label><input type="password" id="liPassword" placeholder="Your password" onkeydown="if(event.key==='Enter') submitLogin()" /></div>
+        <button class="action-btn" id="loginBtn" onclick="submitLogin()"><i class="fas fa-right-to-bracket"></i> Sign In</button>
+        <div id="loginStatus"></div>
+        <div class="switch-link">Need a staff account? <a onclick="renderRequestAccountForm()">Request access</a></div>
+      `;
+    }
+
+    async function submitLogin() {
+      const username = document.getElementById('liUsername').value.trim();
+      const password = document.getElementById('liPassword').value;
+      const statusEl = document.getElementById('loginStatus');
+      const btn = document.getElementById('loginBtn');
+
+      if (!username || !password) {
+        statusEl.innerHTML = `<div class="status-msg danger">Please enter both username and password.</div>`;
+        return;
+      }
+
+      btn.disabled = true;
+      statusEl.innerHTML = `<div class="status-msg info">🔄 Verifying...</div>`;
+
+      try {
+        const accounts = await getAccounts();
+        const account = accounts.find(a => a.username.toLowerCase() === username.toLowerCase());
+
+        if (!account) {
+          statusEl.innerHTML = `<div class="status-msg danger">No account found with that username.</div>`;
+          btn.disabled = false;
+          return;
+        }
+
+        if (account.status === 'pending') {
+          statusEl.innerHTML = `<div class="status-msg danger">Your account is awaiting approval from the root administrator.</div>`;
+          btn.disabled = false;
+          return;
+        }
+
+        if (account.status === 'rejected') {
+          statusEl.innerHTML = `<div class="status-msg danger">This account request was not approved. Contact the administrator.</div>`;
+          btn.disabled = false;
+          return;
+        }
+
+        const enteredHash = await hashPassword(password);
+        if (enteredHash !== account.passwordHash) {
+          statusEl.innerHTML = `<div class="status-msg danger">Incorrect password.</div>`;
+          btn.disabled = false;
+          return;
+        }
+
+        setSession(account);
+        statusEl.innerHTML = `<div class="status-msg success">✅ Welcome back, ${account.firstName}! Redirecting...</div>`;
+        setTimeout(() => { window.location.href = 'admin.html'; }, 700);
+      } catch (err) {
+        statusEl.innerHTML = `<div class="status-msg danger">❌ Login failed: ${err.message}</div>`;
+        btn.disabled = false;
+        console.error(err);
+      }
+    }
+
+    // ===========================================================
+    // REQUEST ACCOUNT — creates a PENDING account; only root can approve
+    // ===========================================================
+    function renderRequestAccountForm() {
+      document.getElementById('cardSubtitle').textContent = 'Request Staff Access';
+      const root = document.getElementById('authRoot');
+      root.innerHTML = `
+        <div class="setup-banner"><i class="fas fa-circle-info"></i> Your request will be sent to the root administrator for approval. You won't be able to log in until it's approved.</div>
+        <div class="form-group"><label>First Name</label><input type="text" id="reqFirstName" placeholder="e.g. Chikondi" /></div>
+        <div class="form-group"><label>Surname</label><input type="text" id="reqSurname" placeholder="e.g. Mwale" /></div>
+        <div class="form-group"><label>Choose a Username</label><input type="text" id="reqUsername" placeholder="e.g. c.mwale" /></div>
+        <div class="form-group"><label>Phone Number (10 digits)</label><input type="text" id="reqPhone" placeholder="e.g. 0991234567" maxlength="13" /></div>
+        <div class="form-group">
+          <label>Choose a Password</label>
+          <input type="password" id="reqPassword" placeholder="6+ characters, with a letter and a number" oninput="liveValidatePassword('reqPassword','reqPwHint')" />
+          <div class="hint" id="reqPwHint">Must be more than 6 characters, with at least 1 letter and 1 number.</div>
+        </div>
+        <button class="action-btn" id="reqBtn" onclick="submitAccountRequest()"><i class="fas fa-paper-plane"></i> Submit Request</button>
+        <div id="reqStatus"></div>
+        <div class="switch-link">Already have an account? <a onclick="renderLoginForm()">Back to login</a></div>
+      `;
+    }
+
+    async function submitAccountRequest() {
+      const firstName = document.getElementById('reqFirstName').value.trim();
+      const surname = document.getElementById('reqSurname').value.trim();
+      const username = document.getElementById('reqUsername').value.trim();
+      const phone = document.getElementById('reqPhone').value.trim();
+      const password = document.getElementById('reqPassword').value;
+      const statusEl = document.getElementById('reqStatus');
+      const btn = document.getElementById('reqBtn');
+
+      const errors = [
+        validateName(firstName, 'First name'),
+        validateName(surname, 'Surname'),
+        validateUsername(username),
+        validatePhone(phone),
+        validatePassword(password)
+      ].filter(Boolean);
+
+      if (errors.length > 0) {
+        statusEl.innerHTML = `<div class="status-msg danger">${errors[0]}</div>`;
+        return;
+      }
+
+      btn.disabled = true;
+      statusEl.innerHTML = `<div class="status-msg info">🔄 Submitting request...</div>`;
+
+      try {
+        const accounts = await getAccounts();
+
+        if (accounts.some(a => a.username.toLowerCase() === username.toLowerCase())) {
+          statusEl.innerHTML = `<div class="status-msg danger">That username is already taken. Please choose another.</div>`;
+          btn.disabled = false;
+          return;
+        }
+
+        const passwordHash = await hashPassword(password);
+        accounts.push({
+          username, firstName, surname, phone,
+          passwordHash,
+          isRoot: false,
+          status: 'pending',
+          createdAt: new Date().toISOString()
+        });
+        await saveAccounts(accounts);
+
+        statusEl.innerHTML = `<div class="status-msg success">✅ Request submitted! The root administrator will need to approve your account before you can log in.</div>`;
+        setTimeout(renderLoginForm, 2200);
+      } catch (err) {
+        statusEl.innerHTML = `<div class="status-msg danger">❌ Failed: ${err.message}</div>`;
+        btn.disabled = false;
+        console.error(err);
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

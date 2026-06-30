@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Crest Academy International — Premium Learning Hub</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    /* Premium International School Global Design Elements */
+    body {
+      background: #040714;
+      color: #f1f5f9;
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    
+    /* Luxury Authentication System Overlay */
+    .auth-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(4, 7, 20, 0.98);
+      backdrop-filter: blur(20px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 10000;
+      overflow-y: auto;
+      padding: 20px;
+    }
+    .auth-box {
+      background: linear-gradient(145deg, #0b132b, #070b1e);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 28px;
+      padding: 45px 40px;
+      width: 100%; max-width: 480px;
+      text-align: center;
+      box-shadow: 0 30px 60px -15px rgba(0,0,0,0.7);
+    }
+    .auth-box .brand-icon {
+      font-size: 44px; color: #38bdf8; margin-bottom: 18px;
+      text-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+    }
+    .auth-box h2 { font-size: 26px; font-weight: 800; color: #fff; margin-bottom: 8px; letter-spacing: -0.02em; }
+    .auth-box p { color: #94a3b8; font-size: 13px; margin-bottom: 28px; }
+    
+    .auth-form-group { display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; text-align: left; }
+    .auth-form-group label { font-size: 11px; font-weight: 700; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: -8px; }
+    
+    .input-wrapper { position: relative; width: 100%; }
+    .input-wrapper i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 15px; }
+    
+    .auth-box input, .sidebar-block input, .sidebar-block select, .sidebar-block textarea {
+      width: 100%; padding: 12px 14px 12px 42px;
+      background: #0f172a; border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 12px; color: #fff; font-size: 13px; outline: none;
+      font-family: 'Poppins', sans-serif;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-sizing: border-box;
+    }
+    .auth-box input:focus, .sidebar-block input:focus, .sidebar-block select:focus, .sidebar-block textarea:focus { 
+      border-color: #38bdf8; background: #131e3b; box-shadow: 0 0 12px rgba(56,189,248,0.15); 
+    }
+    
+    /* Password Policy Validation Display */
+    .password-policies {
+      background: rgba(4, 7, 20, 0.6);
+      border-radius: 12px; padding: 14px 18px; margin-top: -6px; margin-bottom: 15px;
+      display: flex; flex-direction: column; gap: 8px; text-align: left;
+      border: 1px solid rgba(255,255,255,0.03);
+    }
+    .policy-item { font-size: 11px; color: #64748b; display: flex; align-items: center; gap: 10px; font-weight: 500; }
+    .policy-item.valid { color: #10b981; }
+    .policy-item.invalid { color: #f43f5e; }
+    
+    .auth-box .submit-btn {
+      width: 100%; padding: 16px;
+      background: linear-gradient(135deg, #0288d1, #38bdf8);
+      color: #040714; border: none; border-radius: 14px;
+      font-size: 15px; font-weight: 700; cursor: pointer; letter-spacing: 0.02em;
+      box-shadow: 0 4px 20px rgba(56,189,248,0.3);
+      transition: all 0.2s ease;
+    }
+    .auth-box .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(56,189,248,0.4); }
+    .auth-box .toggle-text { color: #94a3b8; font-size: 13px; margin-top: 16px; cursor: pointer; }
+    .auth-box .toggle-text span { color: #38bdf8; font-weight: 700; }
+    
+    .auth-box .error-msg { 
+      color: #ef4444; font-size: 12px; margin-top: 14px; background: rgba(239,68,68,0.08); 
+      padding: 12px; border-radius: 10px; border: 1px solid rgba(239,68,68,0.15); display: none; text-align: left;
+    }
+    .auth-box .success-msg { 
+      color: #10b981; font-size: 13px; margin-top: 14px; background: rgba(16,185,129,0.08);
+      padding: 12px; border-radius: 10px; border: 1px solid rgba(16,185,129,0.15); display: none; text-align: left;
+    }
+
+    /* Folder Directory Listing Display Structure */
+    .sidebar-block {
+      background: linear-gradient(145deg, #0b112c, #070b1e);
+      border: 1px solid rgba(79, 195, 247, 0.15);
+      border-radius: 20px; padding: 24px; margin-bottom: 25px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+    .sidebar-block h3 {
+      color: #fff; font-size: 13px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; margin-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,0.05);
+      padding-bottom: 10px;
+    }
+    .folder-item-btn {
+      width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.04); border-radius: 12px;
+      color: #94a3b8; font-size: 13px; font-weight: 600; text-align: left;
+      cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px; transition: all 0.2s ease;
+      box-sizing: border-box;
+    }
+    .folder-item-btn i.left-icon { width: 24px; font-size: 14px; color: #64748b; }
+    .folder-item-btn:hover, .folder-item-btn.active {
+      background: linear-gradient(135deg, rgba(2,136,209,0.15), rgba(56,189,248,0.05));
+      border-color: #38bdf8; color: #fff;
+    }
+    .folder-item-btn:hover i.left-icon, .folder-item-btn.active i.left-icon { color: #38bdf8; }
+
+    /* Form Fields Alignment */
+    .side-form-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; position: relative; }
+    .side-form-group i { position: absolute; left: 14px; top: 38px; color: #64748b; font-size: 13px; }
+    .side-form-group label { font-size: 11px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em; }
+
+    /* Nav bar Link Decor */
+    .nav-link { color: #94a3b8; text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+    .nav-link:hover, .nav-link.active { color: #38bdf8; }
+
+    /* Scrolling Banner Flier Board System */
+    .fliers-container {
+      background: linear-gradient(135deg, #090f24, #131d3a);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 18px; padding: 20px 25px; margin-bottom: 35px;
+      display: flex; align-items: center; gap: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+    }
+    .flier-badge {
+      background: #f43f5e; color: #fff; padding: 8px 14px; border-radius: 10px;
+      font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+      display: flex; align-items: center; gap: 8px; animation: pulse 1.5s infinite alternate;
+    }
+    .flier-track { flex: 1; white-space: nowrap; overflow: hidden; }
+    .flier-text-scroll { display: inline-block; padding-left: 100%; animation: marquee 30s linear infinite; color: #38bdf8; font-weight: 600; font-size: 14px; }
+    .flier-text-scroll span { color: #fff; margin-right: 60px; }
+
+    /* Dynamic Types Tab Filter Decor */
+    .type-tab {
+      background: transparent; border: none; padding: 8px 16px; border-radius: 10px;
+      color: #94a3b8; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+    }
+    .type-tab:hover, .type-tab.active { background: rgba(56, 189, 248, 0.15); color: #fff; }
+
+    @keyframes marquee { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
+    @keyframes pulse { 0% { opacity: 0.6; } 100% { opacity: 1; } }
+  </style>
+</head>
+<body>
+
+  <!-- SECURE GATEWAY ENFORCEMENT OVERLAY -->
+<!-- SECURE GATEWAY ENFORCEMENT OVERLAY -->
+ <div class="auth-overlay" id="studentAuthOverlay" style="display: none;">
+    <div class="auth-box">
+      <div class="brand-icon"><i class="fas fa-building-columns"></i></div>
+      
+      <div id="auth-state-login">
+        <h2>International Student Portal</h2>
+        <p>Authenticate workspace profile identity parameters</p>
+        <div class="auth-form-group">
+          <label>Registered Phone Number</label>
+          <div class="input-wrapper"><i class="fas fa-phone"></i><input type="text" id="loginPhone" placeholder="e.g. +265888123456" /></div>
+          
+          <label>Security Password</label>
+          <div class="input-wrapper"><i class="fas fa-shield-halved"></i><input type="password" id="loginPassword" placeholder="••••••••" /></div>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin: -10px 0 20px; font-size: 12px;">
+          <label style="display: flex; align-items: center; gap: 6px; color: #94a3b8; cursor: pointer;">
+            <input type="checkbox" id="loginRememberMe" style="width: auto; padding: 0; margin: 0; accent-color: var(--accent-primary);"> Remember details
+          </label>
+          <span onclick="switchAuthState('forgot')" style="color: var(--accent-primary); cursor: pointer; font-weight: 600;">Forgot Password?</span>
+        </div>
+
+        <button class="submit-btn" id="loginBtn" onclick="handleStudentLogin()">Sign In to Dashboard</button>
+        <div class="toggle-text" onclick="switchAuthState('register')">New to Crest Academy? <span>Create Account</span></div>
+      </div>
+
+      <div id="auth-state-register" style="display: none;">
+        <h2>Create Workspace Account</h2>
+        <p>Register your student profile metadata credentials</p>
+        <div class="auth-form-group">
+          <label>Full Student Name</label>
+          <div class="input-wrapper"><i class="fas fa-user"></i><input type="text" id="regName" placeholder="e.g. John Doe" /></div>
+
+          <label>Phone Number (Username)</label>
+          <div class="input-wrapper"><i class="fas fa-phone"></i><input type="text" id="regPhone" placeholder="e.g. +265888123456" /></div>
+          
+          <label>Set Security Password</label>
+          <div class="input-wrapper"><i class="fas fa-lock"></i><input type="password" id="regPassword" placeholder="••••••••" /></div>
+        </div>
+        <button class="submit-btn" onclick="handleStudentRegister()">Register & Sign In</button>
+        <div class="toggle-text" onclick="switchAuthState('login')">Already have an account? <span>Sign In</span></div>
+      </div>
+
+      <div id="auth-state-forgot" style="display: none;">
+        <h2>Recover Security Profile</h2>
+        <p>Verify your phone registry node to receive an OTP code link</p>
+        <div class="auth-form-group" id="forgot-step-1">
+          <label>Registered Phone Number</label>
+          <div class="input-wrapper"><i class="fas fa-phone"></i><input type="text" id="resetPhone" placeholder="e.g. +265888123456" /></div>
+          <button class="submit-btn" style="margin-top: 10px;" onclick="handleSendResetCode()">Send Verification Code</button>
+        </div>
+
+        <div class="auth-form-group" id="forgot-step-2" style="display: none;">
+          <div style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); padding: 10px; border-radius: 8px; color: #10b981; font-size: 12px; margin-bottom: 10px;" id="otpFeedbackMsg"></div>
+          
+          <label>Enter 6-Digit SMS Code</label>
+          <div class="input-wrapper"><i class="fas fa-key"></i><input type="text" id="resetOTP" placeholder="e.g. 482019" /></div>
+          
+          <label>New Security Password</label>
+          <div class="input-wrapper"><i class="fas fa-lock"></i><input type="password" id="resetNewPassword" placeholder="••••••••" /></div>
+          
+          <button class="submit-btn" style="margin-top: 10px;" onclick="handleVerifyAndResetPassword()">Update Profile Password</button>
+          <div style="text-align: left; margin-top: 8px;">
+            <span onclick="handleSendResetCode()" style="font-size: 12px; color: var(--accent-primary); cursor: pointer; font-weight: 500;"><i class="fas fa-rotate-right"></i> Resend code to number</span>
+          </div>
+        </div>
+        <div class="toggle-text" onclick="switchAuthState('login')">Return to <span>Sign In Gateway</span></div>
+      </div>
+
+      <div class="error-msg" id="loginError"></div>
+    </div>
+  </div>
+
+<div id="crestChatWidget" style="position: fixed; bottom: 30px; right: 30px; z-index: 9999; font-family: inherit;">
+
+    <a href="assignments.html" target="_blank" title="Assignments Portal" style="background: linear-gradient(135deg, #f59e0b, #fbbf24); color: #040714; border: none; width: 52px; height: 52px; border-radius: 50%; cursor: pointer; box-shadow: 0 8px 32px rgba(245, 158, 11, 0.4); display: flex; align-items: center; justify-content: center; font-size: 20px; text-decoration: none; position: absolute; bottom: 78px; right: 4px;">
+      <i class="fas fa-graduation-cap"></i>
+    </a>
+
+    <button id="chatTriggerBtn" onclick="toggleChatWindow()" style="background: linear-gradient(135deg, #0288d1, #38bdf8); color: #040714; border: none; width: 60px; height: 60px; border-radius: 50%; cursor: pointer; box-shadow: 0 8px 32px rgba(56, 189, 248, 0.4); display: flex; align-items: center; justify-content: center; font-size: 24px; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+      <i class="fas fa-comments" id="chatIcon"></i>
+    </button>
+
+
+    <div id="chatBoxContainer" style="display: none; position: absolute; bottom: 80px; right: 0; width: 380px; height: 520px; background: linear-gradient(145deg, #0b112c, #070b1e); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); flex-direction: column; overflow: hidden;">
+      
+      <div style="background: rgba(15, 23, 42, 0.6); padding: 16px; border-bottom: 1px solid rgba(56, 189, 248, 0.15); display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 10px; height: 10px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981;"></div>
+          <div>
+            <h4 style="font-size: 13px; font-weight: 700; color: #fff; margin: 0; letter-spacing: 0.5px;">Faculty Communication Mesh</h4>
+            <p style="font-size: 10px; color: #38bdf8; margin: 0;">Text & Voice Notes Active</p>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <a href="https://meet.google.com/new" target="_blank" title="Launch Google Meet Video Classroom" style="color: #38bdf8; font-size: 14px; text-decoration: none;">
+            <i class="fas fa-video"></i>
+          </a>
+          <a href="https://wa.me/265987112150?text=Hello%20Crest%20Academy%20Support,%20I%20need%20assistance%20with%20my%20learning%20portal." target="_blank" title="Chat on WhatsApp" style="color: #10b981; font-size: 15px; text-decoration: none;">
+            <i class="fab fa-whatsapp"></i>
+          </a>
+          <a href="tel:0884662849" title="Call Administration Voice Line" style="color: #f59e0b; font-size: 14px; text-decoration: none;">
+            <i class="fas fa-phone"></i>
+          </a>
+          <a href="mailto:taydayoluna@gmail.com?subject=Crest%20Academy%20Academic%20Inquiry" title="Email Crest Academy" style="color: #e2e8f0; font-size: 14px; text-decoration: none;">
+            <i class="fas fa-envelope"></i>
+          </a>
+          <button onclick="toggleChatWindow()" style="background: transparent; border: none; color: #64748b; cursor: pointer; font-size: 16px;"><i class="fas fa-xmark"></i></button>
+        </div>
+      </div>
+
+      <div id="chatMessagesLog" style="flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; background: rgba(4, 7, 20, 0.3);">
+        </div>
+
+      <div id="voiceRadarHUD" style="display: none; padding: 12px 20px; background: rgba(239, 68, 68, 0.1); border-top: 1px solid rgba(239, 68, 68, 0.2); align-items: center; justify-content: space-between; color: #ef4444; font-size: 12px; font-weight: 600;">
+        <span style="display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-circle" style="animation: pulse 0.6s infinite alternate; font-size: 10px;"></i> 
+          Recording Audio Note...
+        </span>
+        <span id="voiceDuration">0:00</span>
+      </div>
+
+      <!-- LIVE CAMERA / VIDEO CAPTURE OVERLAY -->
+      <div id="cameraCaptureHUD" style="display: none; flex-direction: column; background: #000; border-top: 1px solid rgba(56, 189, 248, 0.2);">
+        <div style="position: relative; width: 100%; height: 220px; background: #000; overflow: hidden;">
+          <video id="cameraLivePreview" autoplay playsinline muted style="width: 100%; height: 100%; object-fit: cover;"></video>
+          <canvas id="photoCaptureCanvas" style="display: none;"></canvas>
+          <div id="videoRecBadge" style="display: none; position: absolute; top: 10px; left: 10px; background: rgba(239,68,68,0.9); color: #fff; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 8px; align-items: center; gap: 6px;">
+            <i class="fas fa-circle" style="animation: pulse 0.6s infinite alternate; font-size: 8px;"></i>
+            <span id="videoRecDuration">0:00</span>
+          </div>
+          <button onclick="closeCameraCapture()" style="position: absolute; top: 10px; right: 10px; background: rgba(4,7,20,0.6); border: none; color: #fff; width: 28px; height: 28px; border-radius: 8px; cursor: pointer; font-size: 13px;">
+            <i class="fas fa-xmark"></i>
+          </button>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: center; gap: 16px; padding: 12px; background: #040714;">
+          <button id="snapPhotoBtn" onclick="capturePhotoFromStream()" title="Take photo" style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-camera"></i>
+          </button>
+          <button id="recordVideoBtn" onclick="toggleVideoRecording()" title="Record video" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; width: 54px; height: 54px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-video" id="recordVideoIcon"></i>
+          </button>
+        </div>
+      </div>
+
+      <div style="padding: 14px; background: #040714; border-top: 1px solid rgba(255,255,255,0.05); display: flex; gap: 8px; align-items: center;">
+        
+        <button id="micBtn" onclick="handleMicToggle()" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #ef4444; width: 42px; height: 42px; border-radius: 12px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0;">
+          <i class="fas fa-microphone" id="micIcon"></i>
+        </button>
+
+        <button id="cameraBtn" onclick="openCameraCapture()" title="Take a photo or video" style="background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.3); color: #a855f7; width: 42px; height: 42px; border-radius: 12px; cursor: pointer; font-size: 15px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0;">
+          <i class="fas fa-camera" id="cameraIcon"></i>
+        </button>
+
+        <input type="text" id="chatInputField" placeholder="Type a message or record voice notes..." onkeydown="if(event.key === 'Enter') dispatchChatMessage()" style="flex: 1; padding: 12px 14px; background: #0f172a; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; color: #fff; font-size: 12px; outline: none;" />
+        
+        <button onclick="dispatchChatMessage()" style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; width: 42px; height: 42px; border-radius: 12px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0;">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+
+    </div>
+  </div>
+  
+
+  <!-- RECOVERY OVERLAY STATE PANEL -->
+    <div class="auth-box" id="resetFormState" style="display: none;">
+      <div class="brand-icon"><i class="fas fa-rotate-left" style="color: #a855f7;"></i></div>
+      <h2>Account Recovery</h2>
+      <p>Confirm registration metadata indexes to update access key</p>
+      <div class="auth-form-group">
+        <label>Registered Name and Surname</label>
+        <div class="input-wrapper"><i class="fas fa-user"></i><input type="text" id="resetFullName" placeholder="e.g. Liam Banda" /></div>
+        <label>Account Phone Number</label>
+        <div class="input-wrapper"><i class="fas fa-phone"></i><input type="text" id="resetPhone" placeholder="e.g. +265888123456" /></div>
+        <label>New Complex Password</label>
+        <div class="input-wrapper"><i class="fas fa-lock-open"></i><input type="password" id="resetNewPassword" placeholder="Minimum 8 characters" oninput="validateResetPasswordRulesLive()" /></div>
+      </div>
+      <div class="password-policies">
+        <div class="policy-item" id="reset-rule-length"><i class="fas fa-circle-xmark" style="color:#f43f5e;margin-right:8px;"></i> 8+ Characters</div>
+        <div class="policy-item" id="reset-rule-upper"><i class="fas fa-circle-xmark" style="color:#f43f5e;margin-right:8px;"></i> Uppercase Case (A-Z)</div>
+        <div class="policy-item" id="reset-rule-lower"><i class="fas fa-circle-xmark" style="color:#f43f5e;margin-right:8px;"></i> Lowercase Case (a-z)</div>
+        <div class="policy-item" id="reset-rule-number"><i class="fas fa-circle-xmark" style="color:#f43f5e;margin-right:8px;"></i> Numerical Digit (0-9)</div>
+        <div class="policy-item" id="reset-rule-special"><i class="fas fa-circle-xmark" style="color:#f43f5e;margin-right:8px;"></i> Special Character (@, #, $)</div>
+      </div>
+      <button class="submit-btn" style="background: linear-gradient(135deg, #a855f7, #6366f1);" onclick="handleStudentPasswordReset()">Overwrite Credentials Node</button>
+      <div class="error-msg" id="resetError"></div>
+      <div class="success-msg" id="resetSuccess"></div>
+      <p class="toggle-text" onclick="toggleAuthState('login')">Return to gateway board? <span>Sign In</span></p>
+    </div>
+  </div>
+
+  <!-- PLATFORM WEB INTERFACE APPLICATION LOADER -->
+  <div class="loader" id="loader" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#040714; display:flex; align-items:center; justify-content:center; z-index:9999; transition: opacity 0.5s;">
+    <div style="text-align:center;">
+      <div style="font-size:55px; margin-bottom:15px; animation: pulse 1.5s infinite alternate;">🛡️</div>
+      <h2 style="color:#fff; font-family:'Poppins', sans-serif; font-weight:800; letter-spacing:1px;">CREST HUB</h2>
+      <p style="color:#94a3b8;">Verifying secure gateway metrics...</p>
+    </div>
+  </div>
+
+  <!-- NAVIGATION COMPONENT HEADER -->
+  <header style="position: sticky; top:0; background: rgba(4,7,20,0.95); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255,255,255,0.08); padding: 22px 5%; display: flex; justify-content: space-between; align-items: center; z-index: 999;">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span style="font-size: 26px;">🏰</span>
+      <div style="color: #fff; font-weight: 800; font-size: 21px; letter-spacing: -0.5px;">CREST <span style="color:#38bdf8;">INTERNATIONAL</span></div>
+    </div>
+    <nav style="display: flex; gap: 30px; align-items: center;">
+      <a href="#" class="nav-link active" onclick="resetHomeView()">Home Directory</a>
+      <a href="about.html" class="nav-link">About Portal</a>
+      <a href="contact.html" class="nav-link">Help Desk</a>
+      <a href="admin.html" class="nav-link" style="border: 1px solid rgba(56,189,248,0.3); padding: 8px 18px; border-radius: 10px; background: rgba(56,189,248,0.06); font-weight: 600;"><i class="fas fa-user-shield"></i> System Administration</a>
+      <button onclick="handleStudentLogout()" style="background: rgba(239,68,68,0.12); color: #f43f5e; border: 1px solid rgba(239,68,68,0.25); padding: 8px 16px; border-radius: 10px; cursor: pointer; font-weight: 700;"><i class="fas fa-right-from-bracket"></i> Leave Hub</button>
+    </nav>
+  </header>
+
+  <!-- CONTENT VIEWPORTS -->
+  <main style="padding: 40px 5%; max-width: 1450px; margin: 0 auto;">
+    
+    <!-- BRAND HERO HEADER REMARKS VIEW -->
+    <div style="background: linear-gradient(135deg, #0b112c, #091c3f); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 24px; padding: 55px 40px; margin-bottom: 30px; text-align: center; position: relative; overflow: hidden; box-shadow: var(--shadow);">
+      <div style="position: absolute; top: -40px; left: -40px; font-size: 160px; color: rgba(56, 189, 248, 0.02); pointer-events: none;"><i class="fas fa-globe"></i></div>
+      <h1 style="font-size: 38px; font-weight: 800; color: #fff; margin-bottom: 12px; letter-spacing: -0.02em;">Welcome Back, <span id="studentDisplayName" style="color:#38bdf8;">Honored Student</span>!</h1>
+      <p style="color: #94a3b8; max-width: 700px; margin: 0 auto; font-size: 15px; line-height: 1.7;">Your elite cloud access pipeline is completely synchronized. Browse syllabus material, track homework nodes, view video masterclasses, or dispatch query cards to institutional desk agents down below.</p>
+      
+      <div style="position: relative; max-width: 560px; margin: 35px auto 0;">
+        <input type="text" id="searchBox" placeholder="Query masterclasses, textbooks, syllabus units..." oninput="searchBooks()" style="width:100%; padding: 18px 22px 18px 58px; background: #040714; border: 1px solid rgba(56,189,248,0.2); border-radius: 16px; color:#fff; outline:none; font-family:inherit; box-shadow: inset 0 2px 5px rgba(0,0,0,0.4);" />
+        <i class="fas fa-magnifying-glass" style="position: absolute; left: 22px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 16px;"></i>
+      </div>
+    </div>
+
+    <!-- CAMPUS MARQUEE FLIER SCROLL BOARD -->
+    <div class="fliers-container">
+      <div class="flier-badge"><i class="fas fa-certificate"></i> Global Campus Fliers</div>
+      <div class="flier-track">
+        <div class="flier-text-scroll">
+          <span>🌟 <strong>Academic Profile Status:</strong> Standard Cambridge IGCSE, AS/A-Levels, and MANEB assessment resources are fully operational.</span>
+          <span>⚡ <strong>Streaming Matrix Update:</strong> Premium high-definition video masterclass files have been cataloged for advanced STEM tracks.</span>
+          <span>🏆 <strong>Notice:</strong> For personalized physical book checkouts or specific topic breakdowns, configure a dispatch token array.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN CONTROL STRUCTURE HUB VIEW -->
+    <div id="hubView" style="display: grid; grid-template-columns: 320px 1fr; gap: 40px;">
+      
+      <!-- DIRECTORY NAVIGATION SIDEBAR CONTROLS -->
+      <aside style="display: flex; flex-direction: column;">
+        
+        <!-- BLOCK 1: Academic Track Selection -->
+        <div class="sidebar-block">
+          <h3><i class="fas fa-graduation-cap" style="color:#38bdf8;margin-right:8px;"></i> Enrollment Track</h3>
+          <button class="folder-item-btn" id="btn-primary" onclick="chooseLevel('primary')"><span><i class="fas fa-child left-icon"></i> Primary School</span><i class="fas fa-chevron-right"></i></button>
+          <button class="folder-item-btn" id="btn-secondary" onclick="chooseLevel('secondary')"><span><i class="fas fa-user-graduate left-icon"></i> Secondary Tier</span><i class="fas fa-chevron-right"></i></button>
+          <button class="folder-item-btn" id="btn-tertiary" onclick="chooseLevel('tertiary')"><span><i class="fas fa-building-columns left-icon"></i> Tertiary Level</span><i class="fas fa-chevron-right"></i></button>
+        </div>
+
+        <!-- BLOCK 2: Form/Standard Allocation Mapping -->
+        <div class="sidebar-block" id="classFilterBox" style="display:none;">
+          <h3><i class="fas fa-cubes" style="color:#38bdf8;margin-right:8px;"></i> Grade Allocation</h3>
+          <div id="classContainer" style="display:flex; flex-direction:column; gap:2px;"></div>
+        </div>
+
+        <!-- BLOCK 3: Verified Subject Directory Folder Trees -->
+        <div class="sidebar-block" id="subjectFilterBox" style="display:none;">
+          <h3><i class="fas fa-folder-open" style="color:#38bdf8;margin-right:8px;"></i> Subject Directory</h3>
+          <div id="subjectContainer" style="display:flex; flex-direction:column; gap:2px;"></div>
+        </div>
+
+        <!-- PREMIUM ON-DEMAND SUBMISSION & CONCEPT QUERY TERMINAL -->
+        <div class="sidebar-block" style="border: 1px solid rgba(168, 85, 247, 0.3); background: linear-gradient(145deg, #0e0d28, #070b1e);">
+          <h3 style="border-color: rgba(168, 85, 247, 0.2);"><i class="fas fa-cloud-arrow-up" style="color:#a855f7;margin-right:8px;"></i> Request Desk Hub</h3>
+          
+          <div class="side-form-group">
+            <label>Student Full Name</label>
+            <i class="fas fa-user-circle"></i>
+            <input type="text" id="panelStudentName" placeholder="Name & Surname" />
+          </div>
+
+          <div class="side-form-group">
+            <label>Academic Email</label>
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="panelStudentEmail" placeholder="student@crest.school" />
+          </div>
+
+          <div class="side-form-group">
+            <label>Subject Topic Stream</label>
+            <i class="fas fa-book-bookmark"></i>
+            <input type="text" id="panelRequestSubject" placeholder="e.g. Physics, Pure Math" />
+          </div>
+
+          <div class="side-form-group">
+            <label>Required Format Core</label>
+            <i class="fas fa-list-check" style="top:38px;"></i>
+            <select id="panelRequestFormat" style="padding-left:42px;">
+              <option value="Video Masterclass">📺 Video Masterclass Lecture</option>
+              <option value="Past Exam Paper">📝 Past Examination Paper</option>
+              <option value="eBook Textbook">📖 eBook / Textbook Reference</option>
+              <option value="Lecture Notes">📓 Complete Structured Notes</option>
+            </select>
+          </div>
+
+          <div class="side-form-group">
+            <label>Problem / Task Summary</label>
+            <i class="fas fa-pen-nib" style="top:38px;"></i>
+            <textarea id="panelRequestProblem" rows="3" placeholder="Describe the assignment task or topic explanation needed..." style="padding-left:42px; resize: none;"></textarea>
+          </div>
+
+          <button id="panelRequestSubmitBtn" onclick="submitPanelRequestTicket()" style="width:100%; padding:12px; background:linear-gradient(135deg, #a855f7, #6366f1); border:none; border-radius:10px; color:#fff; font-weight:700; cursor:pointer; font-size:12px; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow: 0 4px 15px rgba(168,85,247,0.2); margin-top:5px;">
+            <i class="fas fa-paper-plane"></i> Transmit Work Request
+          </button>
+          <p id="panelFormStatus" style="font-size:11px; font-weight:600; text-align:center; margin-top:10px; display:none;"></p>
+        </div>
+      </aside>
+
+      <!-- ASSET DATA INTERACTIVE STREAMS SECTION (FOLDER PACK TIERS) -->
+      <section>
+        
+        <!-- PRIMARY SCHOOL STREAM FILTER PACK -->
+        <div style="background: linear-gradient(145deg, #0b112c, #060a1f); border: 1px solid rgba(56, 189, 248, 0.15); border-radius: 16px; padding: 20px; margin-bottom: 20px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px; color: #38bdf8; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em;">
+            <i class="fas fa-folder-open" style="color: #eab308; font-size: 16px;"></i> Primary School Repository Assets
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+            <div style="display: flex; gap: 8px; background: #040714; padding: 6px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+              <button class="type-tab active" id="pri-type-All" onclick="currentLevel='primary'; updateTabStyles('pri', 'type', 'All'); filterByType('All')">All Content</button>
+              <button class="type-tab" id="pri-type-Video" onclick="currentLevel='primary'; updateTabStyles('pri', 'type', 'Video Lesson'); filterByType('Video Lesson')"><i class="fas fa-circle-play" style="color:#ef4444;"></i> Videos</button>
+              <button class="type-tab" id="pri-type-Book" onclick="currentLevel='primary'; updateTabStyles('pri', 'type', 'Book'); filterByType('Book')"><i class="fas fa-book-open-reader" style="color:#38bdf8;"></i> Books</button>
+              <button class="type-tab" id="pri-type-Notes" onclick="currentLevel='primary'; updateTabStyles('pri', 'type', 'Notes'); filterByType('Notes')"><i class="fas fa-file-invoice" style="color:#a855f7;"></i> Notes</button>
+              <button class="type-tab" id="pri-type-Past" onclick="currentLevel='primary'; updateTabStyles('pri', 'type', 'Past Paper'); filterByType('Past Paper')"><i class="fas fa-sheet-plastic" style="color:#10b981;"></i> Past Papers</button>
+            </div>
+            <div style="display: flex; gap: 8px; background: #040714; padding: 6px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+              <button class="type-tab active" id="pri-syll-All" onclick="currentLevel='primary'; updateTabStyles('pri', 'syll', 'All'); filterBySyllabus('All')">All Syllabi</button>
+              <button class="type-tab" id="pri-syll-National" onclick="currentLevel='primary'; updateTabStyles('pri', 'syll', 'National'); filterBySyllabus('National')">National</button>
+              <button class="type-tab" id="pri-syll-Cambridge" onclick="currentLevel='primary'; updateTabStyles('pri', 'syll', 'Cambridge'); filterBySyllabus('Cambridge')">Cambridge</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECONDARY TIER STREAM FILTER PACK -->
+        <div style="background: linear-gradient(145deg, #0b112c, #060a1f); border: 1px solid rgba(168, 85, 247, 0.15); border-radius: 16px; padding: 20px; margin-bottom: 20px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px; color: #a855f7; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em;">
+            <i class="fas fa-folder-open" style="color: #eab308; font-size: 16px;"></i> Secondary Tier Repository Assets
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+            <div style="display: flex; gap: 8px; background: #040714; padding: 6px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+              <button class="type-tab active" id="sec-type-All" onclick="currentLevel='secondary'; updateTabStyles('sec', 'type', 'All'); filterByType('All')">All Content</button>
+              <button class="type-tab" id="sec-type-Video" onclick="currentLevel='secondary'; updateTabStyles('sec', 'type', 'Video Lesson'); filterByType('Video Lesson')"><i class="fas fa-circle-play" style="color:#ef4444;"></i> Videos</button>
+              <button class="type-tab" id="sec-type-Book" onclick="currentLevel='secondary'; updateTabStyles('sec', 'type', 'Book'); filterByType('Book')"><i class="fas fa-book-open-reader" style="color:#38bdf8;"></i> Books</button>
+              <button class="type-tab" id="sec-type-Notes" onclick="currentLevel='secondary'; updateTabStyles('sec', 'type', 'Notes'); filterByType('Notes')"><i class="fas fa-file-invoice" style="color:#a855f7;"></i> Notes</button>
+              <button class="type-tab" id="sec-type-Past" onclick="currentLevel='secondary'; updateTabStyles('sec', 'type', 'Past Paper'); filterByType('Past Paper')"><i class="fas fa-sheet-plastic" style="color:#10b981;"></i> Past Papers</button>
+            </div>
+            <div style="display: flex; gap: 8px; background: #040714; padding: 6px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+              <button class="type-tab active" id="sec-syll-All" onclick="currentLevel='secondary'; updateTabStyles('sec', 'syll', 'All'); filterBySyllabus('All')">All Syllabi</button>
+              <button class="type-tab" id="sec-syll-National" onclick="currentLevel='secondary'; updateTabStyles('sec', 'syll', 'National'); filterBySyllabus('National')">National</button>
+              <button class="type-tab" id="sec-syll-Cambridge" onclick="currentLevel='secondary'; updateTabStyles('sec', 'syll', 'Cambridge'); filterBySyllabus('Cambridge')">Cambridge</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TERTIARY LEVEL STREAM FILTER PACK -->
+        <div style="background: linear-gradient(145deg, #0b112c, #060a1f); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: 16px; padding: 20px; margin-bottom: 26px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px; color: #10b981; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em;">
+            <i class="fas fa-folder-open" style="color: #eab308; font-size: 16px;"></i> Tertiary Level Repository Assets
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+            <div style="display: flex; gap: 8px; background: #040714; padding: 6px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+              <button class="type-tab active" id="ter-type-All" onclick="currentLevel='tertiary'; updateTabStyles('ter', 'type', 'All'); filterByType('All')">All Content</button>
+              <button class="type-tab" id="ter-type-Video" onclick="currentLevel='tertiary'; updateTabStyles('ter', 'type', 'Video Lesson'); filterByType('Video Lesson')"><i class="fas fa-circle-play" style="color:#ef4444;"></i> Videos</button>
+              <button class="type-tab" id="ter-type-Book" onclick="currentLevel='tertiary'; updateTabStyles('ter', 'type', 'Book'); filterByType('Book')"><i class="fas fa-book-open-reader" style="color:#38bdf8;"></i> Books</button>
+              <button class="type-tab" id="ter-type-Notes" onclick="currentLevel='tertiary'; updateTabStyles('ter', 'type', 'Notes'); filterByType('Notes')"><i class="fas fa-file-invoice" style="color:#a855f7;"></i> Notes</button>
+              <button class="type-tab" id="ter-type-Past" onclick="currentLevel='tertiary'; updateTabStyles('ter', 'type', 'Past Paper'); filterByType('Past Paper')"><i class="fas fa-sheet-plastic" style="color:#10b981;"></i> Past Papers</button>
+            </div>
+            <div style="display: flex; gap: 8px; background: #040714; padding: 6px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+              <button class="type-tab active" id="ter-syll-All" onclick="currentLevel='tertiary'; updateTabStyles('ter', 'syll', 'All'); filterBySyllabus('All')">All Syllabi</button>
+              <button class="type-tab" id="ter-syll-National" onclick="currentLevel='tertiary'; updateTabStyles('ter', 'syll', 'National'); filterBySyllabus('National')">National</button>
+              <button class="type-tab" id="ter-syll-Cambridge" onclick="currentLevel='tertiary'; updateTabStyles('ter', 'syll', 'Cambridge'); filterBySyllabus('Cambridge')">Cambridge</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- DYNAMIC CONTENT RESULT GRID DISPLAY -->
+        <div id="booksGrid" class="books-grid"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer style="margin-top: 100px; border-top:1px solid rgba(255,255,255,0.08); padding:45px 5%; background: rgba(4,7,20,0.98); text-align:center;">
+    <div style="color:#fff; font-weight:800; margin-bottom:10px; letter-spacing:0.02em;">🛡️ THE CREST ACADEMY PROJECTS ALLIANCE</div>
+    <p style="color:#64748b; font-size:13px; margin-bottom:20px;">Designed to achieve professional global status under the management supervision of Sir Taydayo.</p>
+    <div style="font-size:12px; color:#475569;">© 2026 Crest Academy International Group • All Security Registries Guarded.</div>
+  </footer>
+
+  <script>
+  // =========================================================
+  // UNIFIED DATA FILTER MATRIX ENGINE — CREST ACADEMY
+  // =========================================================
+  const API_KEY = "$2a$10$q1K8WzlWXgpkdX5BYcLBfuiYIdv7ZrDcy2OjEiGlXdWC2Y5/CB7e6";
+  const BIN_ID = "6a3e2279da38895dfe014a42";
+  const BASE_URL = "https://api.jsonbin.io/v3/b/" + BIN_ID;
+
+  // Same shared chat bin as the admin console — this is what makes student <-> teacher
+  // messaging actually real instead of two separate local chat logs.
+  const CHAT_BIN_ID = "6a4227f6da38895dfe0eb40f";
+  const CHAT_BASE_URL = "https://api.jsonbin.io/v3/b/" + CHAT_BIN_ID;
+
+  // Cloudinary config — same project as admin console, so media uploaded here
+  // is reachable from any device, not just stuck as base64 on this one phone.
+  const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dfrnpdnld/auto/upload";
+  const CLOUDINARY_PRESET = "taydayo";
+  const CHUNK_SIZE = 20 * 1024 * 1024; // 20MB per chunk — Cloudinary's own default chunk size
+
+  // Uploads a file/blob to Cloudinary in chunks for anything bigger than one chunk.
+  // Required for voice notes/videos so the upload doesn't time out or get cut off
+  // mid-transfer on a slow connection — mirrors the admin console's upload helper.
+  async function uploadToCloudinaryChunked(file, onProgress) {
+    if (file.size <= CHUNK_SIZE) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', CLOUDINARY_PRESET);
+      const res = await fetch(CLOUDINARY_URL, { method: 'POST', body: formData });
+      if (!res.ok) {
+        let detail = '';
+        try { detail = (await res.json()).error?.message || ''; } catch(e) {}
+        throw new Error(`Cloudinary upload failed (status ${res.status})${detail ? ': ' + detail : ''}`);
+      }
+      return await res.json();
+    }
+
+    const uniqueUploadId = 'crest-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
+    const totalSize = file.size;
+    let start = 0;
+    let lastResponse = null;
+
+    while (start < totalSize) {
+      const end = Math.min(start + CHUNK_SIZE, totalSize);
+      const chunk = file.slice(start, end);
+
+      const formData = new FormData();
+      formData.append('file', chunk, file.name || 'upload');
+      formData.append('upload_preset', CLOUDINARY_PRESET);
+      formData.append('cloud_name', 'dfrnpdnld');
+
+      const res = await fetch(CLOUDINARY_URL, {
+        method: 'POST',
+        headers: {
+          'X-Unique-Upload-Id': uniqueUploadId,
+          'Content-Range': `bytes ${start}-${end - 1}/${totalSize}`
+        },
+        body: formData
+      });
+
+      if (!res.ok) {
+        let detail = '';
+        try { detail = (await res.json()).error?.message || ''; } catch(e) {}
+        throw new Error(`Cloudinary chunk upload failed at byte ${start} (status ${res.status})${detail ? ': ' + detail : ''}`);
+      }
+      lastResponse = await res.json();
+      if (onProgress) onProgress(Math.round((end / totalSize) * 100));
+      start = end;
+    }
+    return lastResponse;
+  }
+
+  // Chat lives in its own JSONBin (shared with admin), not localStorage.
+  async function getChatHistory() {
+    try {
+      const res = await fetch(CHAT_BASE_URL + "/latest", {
+        headers: { "X-Master-Key": API_KEY, "X-Bin-Meta": "false" }
+      });
+      const data = await res.json();
+      return data.chat || (Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Failed to fetch chat history:", err);
+      return [];
+    }
+  }
+
+  async function saveChatHistory(chatArray) {
+    try {
+      await fetch(CHAT_BASE_URL, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
+        body: JSON.stringify({ chat: chatArray })
+      });
+    } catch (err) {
+      console.error("Failed to save chat history:", err);
+    }
+  }
+
+  let globalBooksDataset = [];
+  let currentLevel = "secondary";
+  let selectedClass = "";
+  let selectedSubject = "";
+  let selectedType = "All";
+  let selectedSyllabus = "All";
+
+  const localSubjects = {
+    primary: ["Mathematics", "English", "Chichewa", "Primary Science", "Social Studies", "Life Skills"],
+    secondary: ["Mathematics", "Physics", "Chemistry", "Biology", "English Literature", "History", "Geography", "Computer Science", "Business Studies", "Agriculture"],
+    tertiary: ["Computer Engineering", "Advanced Calculus", "Data Structures", "Business Management", "Medicine & Health", "Education"]
+  };
+
+  const localClasses = {
+    primary: ['Standard 1','Standard 2','Standard 3','Standard 4','Standard 5','Standard 6','Standard 7','Standard 8'],
+    secondary: ['Form 1','Form 2','Form 3','Form 4'],
+    tertiary: ['Year 1','Year 2','Year 3','Year 4']
+  };
+
+  async function getBinRecord() {
+    try {
+      const res = await fetch(BASE_URL + "/latest", {
+        headers: { "X-Master-Key": API_KEY, "X-Bin-Meta": "false" }
+      });
+      return await res.json();
+    } catch (err) {
+      console.error("System storage stream failure:", err);
+      return { books: [], students: [] };
+    }
+  }
+
+  async function loadLibraryData() {
+    const record = await getBinRecord();
+    globalBooksDataset = record.books || [];
+    chooseLevel(currentLevel);
+  }
+
+  function chooseLevel(lvl) {
+    currentLevel = lvl;
+    selectedClass = "";
+    selectedSubject = "";
+    selectedType = "All";
+    selectedSyllabus = "All";
+    
+    document.querySelectorAll('.sidebar-block:nth-of-type(1) .folder-item-btn').forEach(btn => btn.classList.remove('active'));
+    if(document.getElementById('btn-' + lvl)) document.getElementById('btn-' + lvl).classList.add('active');
+
+    const classBox = document.getElementById('classFilterBox');
+    const classContainer = document.getElementById('classContainer');
+    classContainer.innerHTML = localClasses[lvl].map(c => `
+      <button class="folder-item-btn sub-class-btn" id="btn-class-${c.replace(' ','')}" onclick="localSelectClass('${c}')">
+        <span><i class="fas fa-chevron-right left-icon" style="font-size:10px;"></i> ${c}</span>
+      </button>
+    `).join('');
+    classBox.style.display = "block";
+    document.getElementById('subjectFilterBox').style.display = "none";
+    processFilterRender();
+  }
+
+  function localSelectClass(cls) {
+    selectedClass = cls;
+    selectedSubject = "";
+    document.querySelectorAll('.sub-class-btn').forEach(btn => btn.classList.remove('active'));
+    const cleanId = 'btn-class-' + cls.replace(' ','');
+    if(document.getElementById(cleanId)) document.getElementById(cleanId).classList.add('active');
+
+    const subjBox = document.getElementById('subjectFilterBox');
+    const subjContainer = document.getElementById('subjectContainer');
+    subjContainer.innerHTML = `
+      <button class="folder-item-btn sub-subj-btn active" id="btn-subj-all" onclick="localSelectSubject('')">
+        <span><i class="fas fa-layer-group left-icon" style="color:#38bdf8;"></i> All Subjects</span>
+      </button>
+    ` + localSubjects[currentLevel].map(s => `
+      <button class="folder-item-btn sub-subj-btn" id="btn-subj-${s.replace(/[^A-Za-z0-9]/g,'')}" onclick="localSelectSubject('${s}')">
+        <span><i class="fas fa-book-bookmark left-icon"></i> ${s}</span>
+      </button>
+    `).join('');
+    subjBox.style.display = "block";
+    processFilterRender();
+  }
+
+  function localSelectSubject(sb) {
+    selectedSubject = sb;
+    document.querySelectorAll('.sub-subj-btn').forEach(btn => btn.classList.remove('active'));
+    if(!sb) {
+      document.getElementById('btn-subj-all').classList.add('active');
+    } else {
+      const cleanId = 'btn-subj-' + sb.replace(/[^A-Za-z0-9]/g,'');
+      if(document.getElementById(cleanId)) document.getElementById(cleanId).classList.add('active');
+    }
+    processFilterRender();
+  }
+
+  function filterByType(type) { selectedType = type; processFilterRender(); }
+  function filterBySyllabus(syll) { selectedSyllabus = syll; processFilterRender(); }
+  function searchBooks() { processFilterRender(); }
+
+  function updateTabStyles(prefix, category, value) {
+    document.querySelectorAll(`[id^="${prefix}-${category}-"]`).forEach(b => b.classList.remove('active'));
+    const safeId = `${prefix}-${category}-${value.replace(' Lesson','')}`;
+    if(document.getElementById(safeId)) document.getElementById(safeId).classList.add('active');
+  }
+
+  function processFilterRender() {
+    const container = document.getElementById('booksGrid');
+    const searchVal = document.getElementById('searchBox').value.toLowerCase().trim();
+
+    let datasets = globalBooksDataset.filter(b => b.level === currentLevel);
+
+    if (selectedClass) {
+      datasets = datasets.filter(b => b.className === selectedClass);
+    }
+    if (selectedSubject) {
+      datasets = datasets.filter(b => b.subject === selectedSubject);
+    }
+    if (searchVal) {
+      datasets = datasets.filter(b => 
+        (b.title || "").toLowerCase().includes(searchVal) || 
+        (b.subject || "").toLowerCase().includes(searchVal)
+      );
+    }
+    if (selectedType !== "All") {
+      datasets = datasets.filter(b => b.type === selectedType);
+    }
+    if (selectedSyllabus !== "All") {
+      datasets = datasets.filter(b => b.syllabus === selectedSyllabus);
+    }
+
+    if (datasets.length === 0) {
+      container.innerHTML = `<p style="grid-column: 1/-1; color:#64748b; font-size:13px; font-style:italic; padding:20px 0;">📭 No resources matching this filter configuration are available yet.</p>`;
+      return;
+    }
+
+    container.innerHTML = datasets.map(item => {
+      const isVideo = item.type === "Video Lesson";
+      const trackBadge = item.syllabus === "Cambridge" ? "🇬🇧 Cambridge" : "🇲🇼 National";
+      const badgeLabel = isVideo ? `📺 Video • ${trackBadge}` : `📄 ${item.type} • ${trackBadge}`;
+      return `
+        <div class="card">
+          <div>
+            <span class="card-badge ${isVideo ? 'badge-video' : 'badge-doc'}">${badgeLabel}</span>
+            <div class="card-icon">${isVideo ? '📺' : '📖'}</div>
+            <h4>${item.title}</h4>
+            <p class="meta-text">${item.subject} • ${item.className || 'General'}</p>
+          </div>
+          <div class="action-row">
+            <a href="${item.link}" target="_blank" rel="noopener" class="btn-action ${isVideo ? 'action-watch' : 'action-down'}">
+              <i class="fas ${isVideo ? 'fa-play' : 'fa-download'}"></i> ${isVideo ? 'Watch Lesson' : 'Download'}
+            </a>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function resetHomeView() {
+    document.getElementById('searchBox').value = "";
+    chooseLevel('secondary');
+  }
+
+  // 🛡️ SECURITY REGISTRY HANDLERS
+  function resetHomeView() {
+      document.getElementById('searchBox').value = "";
+      chooseLevel('secondary');
+    }
+
+    // =========================================================
+    // UPGRADED AUTH STATE REGISTRY MACHINE
+    // =========================================================
+    let simulatedServerOTP = "";
+
+    function switchAuthState(state) {
+      document.getElementById('auth-state-login').style.display = 'none';
+      document.getElementById('auth-state-register').style.display = 'none';
+      document.getElementById('auth-state-forgot').style.display = 'none';
+      document.getElementById('loginError').style.display = 'none';
+
+      if(state === 'login') document.getElementById('auth-state-login').style.display = 'block';
+      if(state === 'register') document.getElementById('auth-state-register').style.display = 'block';
+      if(state === 'forgot') {
+        document.getElementById('auth-state-forgot').style.display = 'block';
+        document.getElementById('forgot-step-1').style.display = 'block';
+        document.getElementById('forgot-step-2').style.display = 'none';
+      }
+    }
+
+    // 🛡️ CHECK SESSION AND PRE-FILL SAVED CREDS
+    function checkActiveWorkspaceSession() {
+      const rememberedPhone = localStorage.getItem('crest_remembered_phone');
+      const rememberedPass = localStorage.getItem('crest_remembered_pass');
+      if (rememberedPhone && rememberedPass) {
+        document.getElementById('loginPhone').value = rememberedPhone;
+        document.getElementById('loginPassword').value = rememberedPass;
+        document.getElementById('loginRememberMe').checked = true;
+      }
+
+      const token = localStorage.getItem('crest_active_student_session');
+      const name = localStorage.getItem('crest_active_student_name');
+      if(token && name) {
+        document.getElementById('studentAuthOverlay').style.display = 'none';
+        document.getElementById('studentDisplayName').textContent = name;
+      } else {
+        document.getElementById('studentAuthOverlay').style.display = 'flex';
+        switchAuthState('login');
+      }
+    }
+
+    // SIGN IN PROCESS
+    function handleStudentLogin() {
+      const phone = document.getElementById('loginPhone').value.trim();
+      const pass = document.getElementById('loginPassword').value;
+      const rememberMe = document.getElementById('loginRememberMe').checked;
+
+      if(!phone || !pass) {
+        showAuthError("Please fill out all identification parameters.");
+        return;
+      }
+
+      if (rememberMe) {
+        localStorage.setItem('crest_remembered_phone', phone);
+        localStorage.setItem('crest_remembered_pass', pass);
+      } else {
+        localStorage.removeItem('crest_remembered_phone');
+        localStorage.removeItem('crest_remembered_pass');
+      }
+
+      const registeredUsers = JSON.parse(localStorage.getItem('crest_registered_users') || "{}");
+      
+      if(registeredUsers[phone]) {
+        if(registeredUsers[phone].password !== pass) {
+          showAuthError("Invalid credentials. Security check verification failed.");
+          return;
+        }
+        localStorage.setItem('crest_active_student_name', registeredUsers[phone].name);
+      } else {
+        localStorage.setItem('crest_active_student_name', "Honored Student");
+      }
+
+      localStorage.setItem('crest_active_student_session', phone);
+      document.getElementById('loginError').style.display = 'none';
+      checkActiveWorkspaceSession();
+    }
+
+    // REGISTER NEW ACCOUNT PROCESS
+    function handleStudentRegister() {
+      const name = document.getElementById('regName').value.trim();
+      const phone = document.getElementById('regPhone').value.trim();
+      const pass = document.getElementById('regPassword').value;
+
+      if(!name || !phone || !pass) {
+        showAuthError("All registration inputs are required.");
+        return;
+      }
+
+      let registeredUsers = JSON.parse(localStorage.getItem('crest_registered_users') || "{}");
+      registeredUsers[phone] = { name: name, password: pass };
+      localStorage.setItem('crest_registered_users', JSON.stringify(registeredUsers));
+
+      localStorage.setItem('crest_active_student_session', phone);
+      localStorage.setItem('crest_active_student_name', name);
+      checkActiveWorkspaceSession();
+    }
+
+    // PASSWORD RECOVERY: DISPATCH VERIFICATION CODE
+    function handleSendResetCode() {
+      const phone = document.getElementById('resetPhone').value.trim();
+      if(!phone) {
+        showAuthError("Provide a registered tracking number target.");
+        return;
+      }
+
+      simulatedServerOTP = Math.floor(100000 + Math.random() * 900000).toString();
+      
+      document.getElementById('loginError').style.display = 'none';
+      document.getElementById('forgot-step-1').style.display = 'none';
+      document.getElementById('forgot-step-2').style.display = 'block';
+      
+      document.getElementById('otpFeedbackMsg').innerHTML = `<i class="fas fa-paper-plane"></i> Code <strong>${simulatedServerOTP}</strong> dispatched to: <strong>${phone}</strong>`;
+    }
+
+    // VERIFY PIN AND UPDATE PASSWORD
+    function handleVerifyAndResetPassword() {
+      const enteredOtp = document.getElementById('resetOTP').value.trim();
+      const newPassword = document.getElementById('resetNewPassword').value;
+      const phone = document.getElementById('resetPhone').value.trim();
+
+      if(enteredOtp !== simulatedServerOTP) {
+        showAuthError("Verification security pin check failed.");
+        return;
+      }
+      if(!newPassword) {
+        showAuthError("Please input a valid password.");
+        return;
+      }
+
+      let registeredUsers = JSON.parse(localStorage.getItem('crest_registered_users') || "{}");
+      if(registeredUsers[phone]) {
+        registeredUsers[phone].password = newPassword;
+      } else {
+        registeredUsers[phone] = { name: "Honored Student", password: newPassword };
+      }
+      
+      localStorage.setItem('crest_registered_users', JSON.stringify(registeredUsers));
+      alert("🔒 Password updated successfully! Proceeding to Sign In.");
+      switchAuthState('login');
+    }
+
+    function showAuthError(text) {
+      const box = document.getElementById('loginError');
+      box.textContent = text;
+      box.style.display = 'block';
+    }
+
+    function handleStudentLogout() {
+      localStorage.removeItem('crest_active_student_session');
+      localStorage.removeItem('crest_active_student_name');
+      checkActiveWorkspaceSession();
+    }
+
+    // =========================================================
+    // REQUEST DESK HUB -> EMAIL DELIVERY (Web3Forms)
+    // =========================================================
+    // 1. Go to https://web3forms.com
+    // 2. Enter the email address you want requests delivered to, get your free Access Key
+    // 3. Paste that key below, replacing "YOUR_WEB3FORMS_ACCESS_KEY_HERE"
+    const WEB3FORMS_ACCESS_KEY = "1f013961-d89a-47f7-bc14-dc7872ecf8da"
+
+    async function submitPanelRequestTicket() {
+      const statusEl = document.getElementById('panelFormStatus');
+      const submitBtn = document.getElementById('panelRequestSubmitBtn');
+
+      const studentName = document.getElementById('panelStudentName').value.trim();
+      const studentEmail = document.getElementById('panelStudentEmail').value.trim();
+      const subjectTopic = document.getElementById('panelRequestSubject').value.trim();
+      const requestFormat = document.getElementById('panelRequestFormat').value;
+      const problemSummary = document.getElementById('panelRequestProblem').value.trim();
+
+      statusEl.style.display = 'block';
+
+      if (!studentName || !studentEmail || !subjectTopic || !problemSummary) {
+        statusEl.style.color = '#ef4444';
+        statusEl.textContent = 'Please fill in all fields before transmitting.';
+        return;
+      }
+
+      if (WEB3FORMS_ACCESS_KEY === "YOUR_WEB3FORMS_ACCESS_KEY_HERE") {
+        statusEl.style.color = '#ef4444';
+        statusEl.textContent = 'Email delivery is not configured yet. Add your Web3Forms access key in the code.';
+        return;
+      }
+
+      statusEl.style.color = '#38bdf8';
+      statusEl.textContent = 'Transmitting request...';
+      if (submitBtn) submitBtn.disabled = true;
+
+      try {
+        const response = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({
+            access_key: WEB3FORMS_ACCESS_KEY,
+            subject: `New Work Request: ${subjectTopic} (${requestFormat})`,
+            from_name: studentName,
+            "Student Full Name": studentName,
+            "Academic Email": studentEmail,
+            "Subject Topic Stream": subjectTopic,
+            "Required Format Core": requestFormat,
+            "Problem / Task Summary": problemSummary
+          })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          statusEl.style.color = '#22c55e';
+          statusEl.textContent = 'Request transmitted successfully! Check your inbox shortly.';
+          document.getElementById('panelStudentName').value = '';
+          document.getElementById('panelStudentEmail').value = '';
+          document.getElementById('panelRequestSubject').value = '';
+          document.getElementById('panelRequestProblem').value = '';
+        } else {
+          statusEl.style.color = '#ef4444';
+          statusEl.textContent = result.message || 'Transmission failed. Please try again.';
+        }
+      } catch (err) {
+        statusEl.style.color = '#ef4444';
+        statusEl.textContent = 'Network error. Please check your connection and try again.';
+        console.error(err);
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    }
+
+    // =========================================================
+    // VOICE & TEXT HYBRID COMMUNICATIONS SYSTEM LOGIC
+    // =========================================================
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
+    let recordTimer = null;
+    let recordSeconds = 0;
+
+    function toggleChatWindow() {
+      const chatBox = document.getElementById('chatBoxContainer');
+      const triggerBtn = document.getElementById('chatTriggerBtn');
+      const icon = document.getElementById('chatIcon');
+
+      if (chatBox.style.display === 'none' || chatBox.style.display === '') {
+        chatBox.style.display = 'flex';
+        icon.className = "fas fa-chevron-down";
+        triggerBtn.style.transform = "scale(0.9)";
+        renderChatLog();
+      } else {
+        chatBox.style.display = 'none';
+        icon.className = "fas fa-comments";
+        triggerBtn.style.transform = "scale(1)";
+        if(isRecording) stopAudioRecording(false);
+        if(cameraStream) closeCameraCapture();
+      }
+    }
+
+    async function handleMicToggle() {
+      const micBtn = document.getElementById('micBtn');
+      const micIcon = document.getElementById('micIcon');
+      const radar = document.getElementById('voiceRadarHUD');
+
+      if (!isRecording) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+
+          mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) audioChunks.push(e.data); };
+          
+          mediaRecorder.onstop = async () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+            stream.getTracks().forEach(track => track.stop());
+            await uploadAndSendAudioMessage(audioBlob);
+          };
+
+          mediaRecorder.start();
+          isRecording = true;
+          micBtn.style.background = "#ef4444";
+          micBtn.style.color = "#fff";
+          micIcon.className = "fas fa-stop";
+          radar.style.display = "flex";
+          
+          recordSeconds = 0;
+          document.getElementById('voiceDuration').textContent = "0:00";
+          recordTimer = setInterval(() => {
+            recordSeconds++;
+            const mins = Math.floor(recordSeconds / 60);
+            const secs = recordSeconds % 60;
+            document.getElementById('voiceDuration').textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+          }, 1000);
+
+        } catch (err) {
+          alert("Microphone permission access denied or unsupported on this device.");
+          console.error(err);
+        }
+      } else {
+        stopAudioRecording(true);
+      }
+    }
+
+    function stopAudioRecording(shouldSave) {
+      clearInterval(recordTimer);
+      document.getElementById('voiceRadarHUD').style.display = "none";
+      const micBtn = document.getElementById('micBtn');
+      const micIcon = document.getElementById('micIcon');
+      
+      micBtn.style.background = "rgba(239, 68, 68, 0.1)";
+      micBtn.style.color = "#ef4444";
+      micIcon.className = "fas fa-microphone";
+      isRecording = false;
+
+      if (mediaRecorder && mediaRecorder.state !== "inactive") {
+        if (!shouldSave) mediaRecorder.onstop = null;
+        mediaRecorder.stop();
+      }
+    }
+
+    
+
+    // =========================================================
+    // LIVE CAMERA / PHOTO / VIDEO CAPTURE SYSTEM LOGIC
+    // =========================================================
+    let cameraStream = null;
+    let videoRecorder = null;
+    let videoChunks = [];
+    let isVideoRecording = false;
+    let videoRecordTimer = null;
+    let videoRecordSeconds = 0;
+
+    async function openCameraCapture() {
+      if (isRecording) stopAudioRecording(false);
+
+      const hud = document.getElementById('cameraCaptureHUD');
+      const previewVideo = document.getElementById('cameraLivePreview');
+
+      try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "user" },
+          audio: true
+        });
+        previewVideo.srcObject = cameraStream;
+        hud.style.display = "flex";
+      } catch (err) {
+        alert("Camera permission access denied or unsupported on this device.");
+        console.error(err);
+      }
+    }
+
+    function closeCameraCapture() {
+      const hud = document.getElementById('cameraCaptureHUD');
+
+      if (isVideoRecording) stopVideoRecording(false);
+
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+      }
+
+      hud.style.display = "none";
+    }
+
+    function capturePhotoFromStream() {
+      const previewVideo = document.getElementById('cameraLivePreview');
+      const canvas = document.getElementById('photoCaptureCanvas');
+
+      if (!cameraStream) return;
+
+      canvas.width = previewVideo.videoWidth;
+      canvas.height = previewVideo.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(previewVideo, 0, 0, canvas.width, canvas.height);
+
+      canvas.toBlob((blob) => {
+        uploadAndSendImageMessage(blob);
+      }, 'image/jpeg', 0.85);
+      closeCameraCapture();
+    }
+
+    function toggleVideoRecording() {
+      if (!isVideoRecording) {
+        startVideoRecording();
+      } else {
+        stopVideoRecording(true);
+      }
+    }
+
+    function startVideoRecording() {
+      if (!cameraStream) return;
+
+      const recordBtn = document.getElementById('recordVideoBtn');
+      const recordIcon = document.getElementById('recordVideoIcon');
+      const badge = document.getElementById('videoRecBadge');
+      const snapBtn = document.getElementById('snapPhotoBtn');
+
+      try {
+        videoRecorder = new MediaRecorder(cameraStream);
+        videoChunks = [];
+
+        videoRecorder.ondataavailable = (e) => { if (e.data.size > 0) videoChunks.push(e.data); };
+
+        videoRecorder.onstop = async () => {
+          const videoBlob = new Blob(videoChunks, { type: 'video/webm' });
+          await uploadAndSendVideoMessage(videoBlob);
+        };
+
+        videoRecorder.start();
+        isVideoRecording = true;
+        recordBtn.style.background = "#ef4444";
+        recordBtn.style.color = "#fff";
+        recordIcon.className = "fas fa-stop";
+        badge.style.display = "flex";
+        snapBtn.style.opacity = "0.4";
+        snapBtn.style.pointerEvents = "none";
+
+        videoRecordSeconds = 0;
+        document.getElementById('videoRecDuration').textContent = "0:00";
+        videoRecordTimer = setInterval(() => {
+          videoRecordSeconds++;
+          const mins = Math.floor(videoRecordSeconds / 60);
+          const secs = videoRecordSeconds % 60;
+          document.getElementById('videoRecDuration').textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }, 1000);
+
+      } catch (err) {
+        alert("Unable to start video recording on this device.");
+        console.error(err);
+      }
+    }
+
+    function stopVideoRecording(shouldSave) {
+      clearInterval(videoRecordTimer);
+      const recordBtn = document.getElementById('recordVideoBtn');
+      const recordIcon = document.getElementById('recordVideoIcon');
+      const badge = document.getElementById('videoRecBadge');
+      const snapBtn = document.getElementById('snapPhotoBtn');
+
+      if (recordBtn) {
+        recordBtn.style.background = "rgba(239, 68, 68, 0.1)";
+        recordBtn.style.color = "#ef4444";
+      }
+      if (recordIcon) recordIcon.className = "fas fa-video";
+      if (badge) badge.style.display = "none";
+      if (snapBtn) { snapBtn.style.opacity = "1"; snapBtn.style.pointerEvents = "auto"; }
+      isVideoRecording = false;
+
+      if (videoRecorder && videoRecorder.state !== "inactive") {
+        if (!shouldSave) videoRecorder.onstop = null;
+        videoRecorder.stop();
+      }
+
+      if (shouldSave) closeCameraCapture();
+    }
+
+    async function uploadAndSendImageMessage(imageBlob) {
+      const statusEl = showChatUploadStatus("Uploading photo...");
+      try {
+        const cloudData = await uploadToCloudinaryChunked(imageBlob, (pct) => updateChatUploadStatus(statusEl, `Uploading photo... ${pct}%`));
+        await pushStudentMessage({ image: cloudData.secure_url });
+      } catch (err) {
+        alert("Photo upload failed: " + err.message);
+        console.error(err);
+      } finally {
+        hideChatUploadStatus(statusEl);
+      }
+    }
+
+    async function uploadAndSendVideoMessage(videoBlob) {
+      const statusEl = showChatUploadStatus("Uploading video...");
+      try {
+        const cloudData = await uploadToCloudinaryChunked(videoBlob, (pct) => updateChatUploadStatus(statusEl, `Uploading video... ${pct}%`));
+        await pushStudentMessage({ video: cloudData.secure_url });
+      } catch (err) {
+        alert("Video upload failed: " + err.message);
+        console.error(err);
+      } finally {
+        hideChatUploadStatus(statusEl);
+      }
+    }
+
+    async function uploadAndSendAudioMessage(audioBlob) {
+      const statusEl = showChatUploadStatus("Uploading voice note...");
+      try {
+        const cloudData = await uploadToCloudinaryChunked(audioBlob, (pct) => updateChatUploadStatus(statusEl, `Uploading voice note... ${pct}%`));
+        await pushStudentMessage({ audio: cloudData.secure_url });
+      } catch (err) {
+        alert("Voice note upload failed: " + err.message);
+        console.error(err);
+      } finally {
+        hideChatUploadStatus(statusEl);
+      }
+    }
+
+    // Small non-blocking status line shown inside the chat box while a media upload is in flight.
+    function showChatUploadStatus(text) {
+      const messageLog = document.getElementById('chatMessagesLog');
+      const el = document.createElement('div');
+      el.style.cssText = "text-align:center; color:#38bdf8; font-size:10px; font-style:italic; padding:6px;";
+      el.textContent = text;
+      messageLog.appendChild(el);
+      messageLog.scrollTop = messageLog.scrollHeight;
+      return el;
+    }
+    function updateChatUploadStatus(el, text) { if (el) el.textContent = text; }
+    function hideChatUploadStatus(el) { if (el && el.parentNode) el.parentNode.removeChild(el); }
+
+    // Writes a new student message straight to the shared chat bin so it's
+    // immediately visible to the admin console on its next poll.
+    async function pushStudentMessage(extraFields) {
+      const currentSender = localStorage.getItem('crest_active_student_name') || "Honored Student";
+      const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      let chatHistory = await getChatHistory();
+
+      chatHistory.push(Object.assign({
+        sender: currentSender,
+        time: timestamp,
+        isTeacher: false,
+        status: "delivered" // saved to the shared bin — admin will see it on next poll
+      }, extraFields));
+
+      await saveChatHistory(chatHistory);
+      renderChatLog();
+    }
+
+    async function dispatchChatMessage() {
+      const input = document.getElementById('chatInputField');
+      const text = input.value.trim();
+      if (!text) return;
+
+      input.value = "";
+      await pushStudentMessage({ message: text });
+    }
+
+    let lastRenderedStudentChatSignature = null; // skip rebuilds (and killing playing audio/video) when nothing's changed
+
+    async function renderChatLog() {
+      const messageLog = document.getElementById('chatMessagesLog');
+      let chatHistory = await getChatHistory();
+
+      const signature = JSON.stringify(chatHistory.map(m => ({ t: m.time, s: m.sender, st: m.status })));
+      if (signature === lastRenderedStudentChatSignature) return;
+      lastRenderedStudentChatSignature = signature;
+
+      // Student is actively viewing the chat, so any teacher message not yet
+      // marked "read" gets marked now — flips the teacher's ticks to read (blue).
+      let needsStatusSave = false;
+      chatHistory.forEach(msg => {
+        if (msg.isTeacher && !msg.isSystem && msg.status !== 'read') {
+          msg.status = 'read';
+          needsStatusSave = true;
+        }
+      });
+      if (needsStatusSave) saveChatHistory(chatHistory);
+
+      if (chatHistory.length === 0) {
+        messageLog.innerHTML = `<div style="text-align: center; color: #64748b; font-size: 10px; font-style: italic; background: rgba(255,255,255,0.02); padding: 6px; border-radius: 8px; border: 1px dashed rgba(255,255,255,0.05);">Secure hybrid direct-mesh pipeline fully synchronized. Tap the mic icon to record voice notes seamlessly.</div>`;
+        return;
+      }
+
+      messageLog.innerHTML = chatHistory.map((msg, idx) => {
+        if(msg.isSystem) {
+          return `<div style="text-align: center; color: #64748b; font-size: 10px; font-style: italic; background: rgba(255,255,255,0.02); padding: 6px; border-radius: 8px; border: 1px dashed rgba(255,255,255,0.05);">${msg.message}</div>`;
+        }
+
+        const isMe = !msg.isTeacher;
+        const bubbleBg = isMe ? 'linear-gradient(135deg, #0288d1, #38bdf8)' : 'rgba(255, 255, 255, 0.05)';
+        const bubbleColor = isMe ? '#040714' : '#fff';
+        const alignSelf = isMe ? 'flex-end' : 'flex-start';
+        const radiusConfig = isMe ? 'border-radius: 16px 16px 2px 16px;' : 'border-radius: 16px 16px 16px 2px; border: 1px solid rgba(255,255,255,0.05);';
+        const labelNameColor = msg.isTeacher ? 'color: #38bdf8;' : 'color: #64748b;';
+
+        // Deleted messages show a neutral placeholder. Students can only delete
+        // their own messages, so this state can be reached either by the student
+        // themself or by admin deleting it from their side.
+        if (msg.deleted) {
+          return `
+            <div style="display: flex; flex-direction: column; max-width: 85%; align-self: ${alignSelf}; gap: 3px;">
+              <span style="font-size: 9px; font-weight: 700; ${labelNameColor} text-transform: uppercase; letter-spacing: 0.02em;">${msg.sender}</span>
+              <div style="background: rgba(255,255,255,0.03); color: #64748b; border: 1px dashed rgba(255,255,255,0.08); padding: 10px 14px; font-size: 11px; font-style: italic; ${radiusConfig}">
+                <i class="fas fa-ban" style="margin-right:6px;"></i> This message was deleted
+              </div>
+              <span style="font-size: 8px; color: #64748b; align-self: ${isMe ? 'flex-end' : 'flex-start'}">${msg.time}</span>
+            </div>
+          `;
+        }
+
+        const dynamicContent = msg.callLink
+          ? `<a href="${msg.callLink}" target="_blank" style="display:flex; align-items:center; gap:10px; background: rgba(34,197,94,0.1); padding:12px 14px; border-radius:10px; text-decoration:none; color:#22c55e; font-size:13px; font-weight:700; border:1px solid rgba(34,197,94,0.3); margin-top:4px;">
+              <i class="fas fa-video" style="font-size:16px;"></i> Join Video Call
+            </a>`
+          : msg.audio 
+          ? `<audio controls src="${msg.audio}" style="width: 220px; height: 32px; margin-top: 4px; filter: invert(0.9) hue-rotate(180deg);"></audio>`
+          : msg.image
+          ? `<img src="${msg.image}" style="max-width: 220px; max-height: 220px; border-radius: 10px; display: block; margin-top: 2px; object-fit: cover;" />`
+          : msg.video
+          ? `<video controls src="${msg.video}" style="max-width: 220px; max-height: 220px; border-radius: 10px; display: block; margin-top: 2px;"></video>`
+          : msg.message;
+
+        // Ticks only show on messages the student SENT — mirrors admin's tick logic.
+        let ticksHtml = '';
+        if (isMe) {
+          const status = msg.status || 'sent';
+          if (status === 'read') {
+            ticksHtml = `<i class="fas fa-check-double" style="color:#38bdf8; font-size:9px; margin-left:4px;"></i>`;
+          } else if (status === 'delivered') {
+            ticksHtml = `<i class="fas fa-check-double" style="color:#64748b; font-size:9px; margin-left:4px;"></i>`;
+          } else {
+            ticksHtml = `<i class="fas fa-check" style="color:#64748b; font-size:9px; margin-left:4px;"></i>`;
+          }
+        }
+
+        // Student can only delete their OWN messages — not the teacher's.
+        const deleteBtnHtml = isMe
+          ? `<button onclick="deleteOwnChatMessage(${idx})" title="Delete message" style="background:none; border:none; color:#64748b; cursor:pointer; font-size:10px; padding:2px 4px; opacity:0.5;"><i class="fas fa-trash-can"></i></button>`
+          : '';
+
+        return `
+          <div style="display: flex; flex-direction: column; max-width: 85%; align-self: ${alignSelf}; gap: 3px;">
+            <div style="display:flex; align-items:center; gap:6px; ${isMe ? 'flex-direction: row-reverse;' : ''}">
+              <span style="font-size: 9px; font-weight: 700; ${labelNameColor} text-transform: uppercase; letter-spacing: 0.02em;">${msg.sender}</span>
+              ${deleteBtnHtml}
+            </div>
+            <div style="background: ${bubbleBg}; color: ${bubbleColor}; padding: 10px 14px; font-size: 12px; font-weight: 500; line-height: 1.4; ${radiusConfig}">
+              ${dynamicContent}
+            </div>
+            <span style="font-size: 8px; color: #64748b; align-self: ${isMe ? 'flex-end' : 'flex-start'}">${msg.time}${ticksHtml}</span>
+          </div>
+        `;
+      }).join('');
+
+      messageLog.scrollTop = messageLog.scrollHeight;
+    }
+
+    // Student can only delete their OWN messages (isMe rows). Replaces with a
+    // placeholder rather than removing it, so the conversation stays consistent
+    // for the teacher too.
+    async function deleteOwnChatMessage(index) {
+      if (!confirm("Delete this message? This cannot be undone.")) return;
+      try {
+        let chatHistory = await getChatHistory();
+        const target = chatHistory[index];
+        if (!target || target.isTeacher) return; // safety check — never delete a teacher message from this side
+        target.deleted = true;
+        delete target.message;
+        delete target.audio;
+        delete target.image;
+        delete target.video;
+        await saveChatHistory(chatHistory);
+        lastRenderedStudentChatSignature = null; // force re-render even though only content changed
+        await renderChatLog();
+      } catch (err) {
+        alert("Failed to delete message: " + err.message);
+        console.error(err);
+      }
+    }
+
+    // Poll the shared chat bin every 4 seconds so new teacher replies show up
+    // without the student needing to reopen the chat box.
+    setInterval(() => { if (document.getElementById('chatMessagesLog')) renderChatLog(); }, 4000);
+
+    
+    // =========================================================
+
+    // =========================================================
+    // INITIALIZATION RUNTIME
+    // =========================================================
+    document.addEventListener("DOMContentLoaded", () => {
+      checkActiveWorkspaceSession();
+      loadLibraryData();
+      setTimeout(() => {
+        const loader = document.getElementById('loader');
+        if(loader) { loader.style.opacity = '0'; setTimeout(() => loader.style.display = 'none', 500); }
+      }, 700);
+    });
+  </script>
+</body>
+</html>
+  
+
+  
