@@ -271,6 +271,22 @@
     </div>
   </div>
 
+  <!-- CONTENT ACCESS GATE -->
+  <div class="auth-overlay" id="downloadGateModal" style="display: none;">
+    <div class="auth-box" style="max-width: 380px;">
+      <div class="brand-icon"><i class="fas fa-lock"></i></div>
+      <h2>Protected Content</h2>
+      <p id="downloadGateTitle" style="color:#38bdf8; font-weight:600; margin-top:-8px;"></p>
+      <div class="auth-form-group">
+        <label>Enter Access Code</label>
+        <div class="input-wrapper"><i class="fas fa-key"></i><input type="password" id="downloadGatePassword" placeholder="••••••••" onkeydown="if(event.key === 'Enter') confirmDownloadAccess()" /></div>
+      </div>
+      <button class="submit-btn" onclick="confirmDownloadAccess()">Unlock & Open</button>
+      <div class="toggle-text" onclick="closeDownloadGate()">Cancel</div>
+      <div class="error-msg" id="downloadGateError"></div>
+    </div>
+  </div>
+
 <div id="crestChatWidget" style="position: fixed; bottom: 30px; right: 30px; z-index: 9999; font-family: inherit;">
 
     <a href="assignments.html" target="_blank" title="Assignments Portal" style="background: linear-gradient(135deg, #f59e0b, #fbbf24); color: #040714; border: none; width: 52px; height: 52px; border-radius: 50%; cursor: pointer; box-shadow: 0 8px 32px rgba(245, 158, 11, 0.4); display: flex; align-items: center; justify-content: center; font-size: 20px; text-decoration: none; position: absolute; bottom: 78px; right: 4px;">
@@ -385,6 +401,9 @@
       <a href="#" class="nav-link active" onclick="resetHomeView()">Home Directory</a>
       <a href="about.html" class="nav-link">About Portal</a>
       <a href="contact.html" class="nav-link">Help Desk</a>
+      <button onclick="showVideoLessonsHub()" title="Video Lessons" style="position:relative; width:44px; height:44px; border-radius:12px; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:#ef4444; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+        <i class="fas fa-circle-play"></i>
+      </button>
       <a href="admin.html" class="nav-link" style="border: 1px solid rgba(56,189,248,0.3); padding: 8px 18px; border-radius: 10px; background: rgba(56,189,248,0.06); font-weight: 600;"><i class="fas fa-user-shield"></i> System Administration</a>
       <button onclick="handleStudentLogout()" style="background: rgba(239,68,68,0.12); color: #f43f5e; border: 1px solid rgba(239,68,68,0.25); padding: 8px 16px; border-radius: 10px; cursor: pointer; font-weight: 700;"><i class="fas fa-right-from-bracket"></i> Leave Hub</button>
     </nav>
@@ -429,6 +448,7 @@
           <button class="folder-item-btn" id="btn-primary" onclick="chooseLevel('primary')"><span><i class="fas fa-child left-icon"></i> Primary School</span><i class="fas fa-chevron-right"></i></button>
           <button class="folder-item-btn" id="btn-secondary" onclick="chooseLevel('secondary')"><span><i class="fas fa-user-graduate left-icon"></i> Secondary Tier</span><i class="fas fa-chevron-right"></i></button>
           <button class="folder-item-btn" id="btn-tertiary" onclick="chooseLevel('tertiary')"><span><i class="fas fa-building-columns left-icon"></i> Tertiary Level</span><i class="fas fa-chevron-right"></i></button>
+          <button class="folder-item-btn" id="btn-videolessons" onclick="showVideoLessonsHub()"><span><i class="fas fa-circle-play left-icon" style="color:#ef4444;"></i> Video Lessons</span><i class="fas fa-chevron-right"></i></button>
         </div>
 
         <!-- BLOCK 2: Form/Standard Allocation Mapping -->
@@ -559,6 +579,18 @@
         <div id="booksGrid" class="books-grid"></div>
       </section>
     </div>
+
+    <!-- YOUTUBE VIDEO LESSONS AUTO-SYNC VIEW -->
+    <div id="videoLessonsView" style="display: none;">
+      <div style="background: linear-gradient(145deg, #0b112c, #060a1f); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 16px; padding: 20px; margin-bottom: 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
+        <div style="display: flex; align-items: center; gap: 10px; color: #ef4444; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em;">
+          <i class="fas fa-circle-play" style="font-size: 18px;"></i> Video Lessons — Crest Academy YouTube
+        </div>
+        <button onclick="chooseLevel(currentLevel)" style="background:var(--bg-input,#12193d); border:1px solid rgba(255,255,255,0.08); color:#94a3b8; padding:10px 16px; border-radius:10px; font-size:12px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:8px;"><i class="fas fa-arrow-left"></i> Back to Library</button>
+      </div>
+      <p style="color:#64748b; font-size:13px; margin-bottom:20px;">Every video posted to the Crest Academy YouTube channel shows up here automatically — nothing to upload manually.</p>
+      <div id="videoLessonsGrid" class="books-grid"></div>
+    </div>
   </main>
 
   <footer style="margin-top: 100px; border-top:1px solid rgba(255,255,255,0.08); padding:45px 5%; background: rgba(4,7,20,0.98); text-align:center;">
@@ -585,6 +617,14 @@
   const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dfrnpdnld/auto/upload";
   const CLOUDINARY_PRESET = "taydayo";
   const CHUNK_SIZE = 20 * 1024 * 1024; // 20MB per chunk — Cloudinary's own default chunk size
+
+  // YouTube auto-sync — pulls your latest uploads from the Crest Academy channel
+  // straight into the "Video Lessons" section. No manual uploading needed once
+  // this is set up: post to YouTube, it shows up here automatically.
+  // See the SETUP INSTRUCTIONS in the chat message for how to get your own key.
+  const YOUTUBE_CHANNEL_ID = "UC11BtK7K5VFNgetQerGzRZw"; // @Crestacademy-k9p
+  const YOUTUBE_UPLOADS_PLAYLIST_ID = "UU" + YOUTUBE_CHANNEL_ID.slice(2);
+  const YOUTUBE_API_KEY = "AIzaSyBj5PaQ8_rCR0njs6OZtghObMeW14c6YU8";
 
   // Uploads a file/blob to Cloudinary in chunks for anything bigger than one chunk.
   // Required for voice notes/videos so the upload doesn't time out or get cut off
@@ -670,6 +710,9 @@
   let selectedSubject = "";
   let selectedType = "All";
   let selectedSyllabus = "All";
+  let currentRenderedDatasets = [];
+  let pendingDownloadLink = null;
+  const CONTENT_ACCESS_CODE = "tayd1";
 
   const localSubjects = {
     primary: ["Agriculture", "Bible Knowledge", "English", "Expressive Arts", "Science and Technology", "Social Studies", "Chichewa", "Life Skills"],
@@ -702,6 +745,9 @@
   }
 
   function chooseLevel(lvl) {
+    document.getElementById('hubView').style.display = 'grid';
+    document.getElementById('videoLessonsView').style.display = 'none';
+
     currentLevel = lvl;
     selectedClass = "";
     selectedSubject = "";
@@ -721,6 +767,90 @@
     classBox.style.display = "block";
     document.getElementById('subjectFilterBox').style.display = "none";
     processFilterRender();
+  }
+
+  // ── YouTube Video Lessons auto-sync ─────────────────────────────────────
+  let youtubeVideosCache = null;
+
+  function showVideoLessonsHub() {
+    document.getElementById('hubView').style.display = 'none';
+    document.getElementById('videoLessonsView').style.display = 'block';
+
+    document.querySelectorAll('.sidebar-block:nth-of-type(1) .folder-item-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById('btn-videolessons').classList.add('active');
+
+    loadYouTubeVideos();
+  }
+
+  async function loadYouTubeVideos() {
+    const grid = document.getElementById('videoLessonsGrid');
+
+    if (YOUTUBE_API_KEY === "PASTE_YOUR_YOUTUBE_API_KEY_HERE") {
+      grid.innerHTML = `
+        <div style="grid-column:1/-1; text-align:center; padding:50px 20px; color:#64748b;">
+          <i class="fas fa-key" style="font-size:32px; color:#ef4444; margin-bottom:14px; display:block;"></i>
+          <strong style="color:#fff;">YouTube sync isn't set up yet.</strong><br>
+          Paste your YouTube Data API key into the <code>YOUTUBE_API_KEY</code> constant near the top of the script to activate this section.
+        </div>`;
+      return;
+    }
+
+    if (youtubeVideosCache) {
+      renderYouTubeVideos(youtubeVideosCache);
+      return;
+    }
+
+    grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:50px; color:#64748b;"><i class="fas fa-spinner fa-spin"></i> Fetching latest uploads...</div>`;
+
+    try {
+      const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${YOUTUBE_UPLOADS_PLAYLIST_ID}&maxResults=25&key=${YOUTUBE_API_KEY}`;
+      const res = await fetch(url);
+      const data = await res.json();
+
+      if (data.error) {
+        grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:50px; color:#ef4444;"><i class="fas fa-triangle-exclamation"></i> Couldn't load videos: ${data.error.message}</div>`;
+        return;
+      }
+
+      const videos = (data.items || [])
+        .filter(item => item.snippet && item.snippet.resourceId && item.snippet.resourceId.videoId)
+        .map(item => ({
+          videoId: item.snippet.resourceId.videoId,
+          title: item.snippet.title,
+          thumbnail: (item.snippet.thumbnails.medium || item.snippet.thumbnails.default).url,
+          publishedAt: item.snippet.publishedAt
+        }));
+
+      youtubeVideosCache = videos;
+      renderYouTubeVideos(videos);
+    } catch (err) {
+      console.error("YouTube fetch failed:", err);
+      grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:50px; color:#ef4444;"><i class="fas fa-triangle-exclamation"></i> Couldn't reach YouTube right now. Check your connection and try again.</div>`;
+    }
+  }
+
+  function renderYouTubeVideos(videos) {
+    const grid = document.getElementById('videoLessonsGrid');
+    if (videos.length === 0) {
+      grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:50px; color:#64748b;">No videos uploaded yet — post one on YouTube and it'll show up here.</div>`;
+      return;
+    }
+
+    grid.innerHTML = videos.map(v => `
+      <div class="card">
+        <div>
+          <span class="card-badge badge-video">📺 Video • YouTube</span>
+          <img src="${v.thumbnail}" alt="${v.title}" style="width:100%; border-radius:10px; margin:8px 0; display:block;" />
+          <h4>${v.title}</h4>
+          <p class="meta-text">${new Date(v.publishedAt).toLocaleDateString()}</p>
+        </div>
+        <div class="action-row">
+          <a href="https://www.youtube.com/watch?v=${v.videoId}" target="_blank" rel="noopener" class="btn-action action-watch">
+            <i class="fas fa-play"></i> Watch Lesson
+          </a>
+        </div>
+      </div>
+    `).join('');
   }
 
   function localSelectClass(cls) {
@@ -797,7 +927,9 @@
       return;
     }
 
-    container.innerHTML = datasets.map(item => {
+    currentRenderedDatasets = datasets;
+
+    container.innerHTML = datasets.map((item, idx) => {
       const isVideo = item.type === "Video Lesson";
       const trackBadge = item.syllabus === "Cambridge" ? "🇬🇧 Cambridge" : "🇲🇼 National";
       const badgeLabel = isVideo ? `📺 Video • ${trackBadge}` : `📄 ${item.type} • ${trackBadge}`;
@@ -810,13 +942,46 @@
             <p class="meta-text">${item.subject} • ${item.className || 'General'}</p>
           </div>
           <div class="action-row">
-            <a href="${item.link}" target="_blank" rel="noopener" class="btn-action ${isVideo ? 'action-watch' : 'action-down'}">
+            <button onclick="requestDownload(${idx})" class="btn-action ${isVideo ? 'action-watch' : 'action-down'}" style="border:none; cursor:pointer; font-family:inherit;">
               <i class="fas ${isVideo ? 'fa-play' : 'fa-download'}"></i> ${isVideo ? 'Watch Lesson' : 'Download'}
-            </a>
+            </button>
           </div>
         </div>
       `;
     }).join('');
+  }
+
+  // ── Password-gated content access ──────────────────────────────────────
+  // Simple front-door gate: asks for an access code before opening any
+  // resource link. Note this lives entirely in the browser, so it deters
+  // casual downloading but isn't real DRM - a technical user could still
+  // read this code or the direct file link.
+  function requestDownload(idx) {
+    const item = currentRenderedDatasets[idx];
+    if (!item) return;
+    pendingDownloadLink = item.link;
+    document.getElementById('downloadGateTitle').textContent = item.title;
+    document.getElementById('downloadGatePassword').value = '';
+    document.getElementById('downloadGateError').style.display = 'none';
+    document.getElementById('downloadGateModal').style.display = 'flex';
+    setTimeout(() => document.getElementById('downloadGatePassword').focus(), 100);
+  }
+
+  function confirmDownloadAccess() {
+    const entered = document.getElementById('downloadGatePassword').value;
+    if (entered === CONTENT_ACCESS_CODE) {
+      document.getElementById('downloadGateModal').style.display = 'none';
+      window.open(pendingDownloadLink, '_blank', 'noopener');
+      pendingDownloadLink = null;
+    } else {
+      document.getElementById('downloadGateError').textContent = 'Incorrect access code.';
+      document.getElementById('downloadGateError').style.display = 'block';
+    }
+  }
+
+  function closeDownloadGate() {
+    document.getElementById('downloadGateModal').style.display = 'none';
+    pendingDownloadLink = null;
   }
 
   function resetHomeView() {
